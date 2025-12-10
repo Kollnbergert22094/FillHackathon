@@ -10,19 +10,11 @@
     },
     {
       "id": 3,
-      "name": "linkes_bein"
+      "name": "beine"
     },
     {
       "id": 4,
-      "name": "rechtes_bein"
-    },
-    {
-      "id": 5,
-      "name": "linker_arm"
-    },
-    {
-      "id": 6,
-      "name": "rechter_arm"
+      "name": "arme"
     }
   ]
 }

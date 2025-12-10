@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Übersicht</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Task Übersicht</h1>
+  <div id="tasks"></div>
+
+  <!-- Popup für Items -->
+  <div id="popup">
+    <span class="close" onclick="closePopup()">✖</span>
+    <h2>Task Items</h2>
+    <div class="items" id="popup-items"></div>
+  </div>
+
+  <script>
+    let BACKEND = "http://10.230.18.39:3000";
+    fetch('/config')
+    .then(res => res.json())
+    .then(config => {
+        BACKEND = "http://" + config.IP_ADRESS + ":" + config.PORT;
+        console.log("Python Backend IP:", BACKEND);
+    });
+
+    const tasksEl = document.getElementById("tasks");
+    const popup = document.getElementById("popup");
+    const popupItemsEl = document.getElementById("popup-items");
+
+    let colorsMap = {};
+    let partsMap = {};
+
+    // Lade Mappings von colors.json und parts.json
+    async function loadMappings() {
+      try {
+        const colorsRes = await fetch('../data/colors.json');
+        const colorsData = await colorsRes.json();
+        colorsData.colors.forEach(c => colorsMap[c.id] = c.name);
+
+        const partsRes = await fetch('../data/parts.json');
+        const partsData = await partsRes.json();
+        partsData.parts.forEach(p => partsMap[p.id] = p.name);
+      } catch (err) {
+        console.error("Fehler beim Laden der Mappings:", err.message);
+      }
+    }
+
+    async function fetchTasks() {
+      try {
+        const res = await fetch(BACKEND + '/api/tasks');
+        const data = await res.json();
+
+        tasksEl.innerHTML = "";
+
+        data.forEach(task => {
+          const div = document.createElement("div");
+          div.className = "task-card";
+          div.innerHTML = `
+            <h3>Task:</h3>
+            <div>${task.taskId}</div>
+            <div class="task-status ${task.status}">${task.status}</div>
+          `;
+          div.onclick = () => showTaskItems(task.taskId);
+          tasksEl.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Fehler beim Abrufen der Tasks:", err.message);
+      }
+    }
+
+    async function showTaskItems(taskId) {
+      try {
+        const res = await fetch(`${BACKEND}/api/tasks/${taskId}/items`);
+        const data = await res.json();
+
+        popupItemsEl.innerHTML = "";
+
+        if (data.items && Array.isArray(data.items)) {
+          data.items.forEach(item => {
+            const partName = partsMap[item.partId] || "unknown";
+            const colorName = colorsMap[item.colorId] || "unknown";
+
+            const div = document.createElement("div");
+            div.className = "part";
+            div.innerHTML = `
+              <img src="../data/images/${item.partId+"_"+item.colorId + ".png" || ''}">
+              <div>${colorName} ${partName}</div>
+            `;
+            popupItemsEl.appendChild(div);
+          });
+        } else {
+          popupItemsEl.innerHTML = "<p>Keine Items gefunden.</p>";
+        }
+
+        popup.style.display = "block";
+      } catch (err) {
+        console.error("Fehler beim Abrufen der Task Items:", err.message);
+        popupItemsEl.innerHTML = "<p>Fehler beim Abrufen der Items.</p>";
+        popup.style.display = "block";
+      }
+    }
+
+    function closePopup() {
+      popup.style.display = "none";
+    }
+
+    // Initialisierung
+    loadMappings().then(() => {
+      fetchTasks();
+      setInterval(fetchTasks, 2000); // Polling alle 2 Sekunden
+    });
+  </script>
+</body>
+</html>
