@@ -107,7 +107,6 @@
       if (pyStatus === "waiting") {
         clearInterval(interval);
         task.status = "done";
-        task.result = resp.data.result || null;
         task.polling = false;
         console.log("Task completed:", taskId);
 
@@ -119,7 +118,6 @@
       if (pyStatus === "error") {
         clearInterval(interval);
         task.status = "error";
-        task.result = resp.data.result || null;
         task.polling = false;
 
         console.log("Task ERROR:", taskId);
@@ -147,8 +145,7 @@
     if (!task) return res.status(404).json({ error: "not found" });
 
     res.json({
-      status: task.status,
-      result: task.result
+      status: task.status
     });
   });
 
