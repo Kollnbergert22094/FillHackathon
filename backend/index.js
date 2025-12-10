@@ -11,7 +11,7 @@ app.use(express.json());
 // --------------------------------------------
 // KONFIGURATION
 // --------------------------------------------
-const PYTHON_BACKEND = "http://10.230.16.39:35443";  
+const PYTHON_BACKEND = "http://10.230.16.39:50587";  
 // Beispiel-IP. Trage hier die echte Python-IP + Port ein.
 
 // Aufbewahrung aller Tasks
@@ -148,6 +148,10 @@ app.listen(PORT, () => {
 });
 
 
+
+
+
+
 app.get("/test/python", async (req, res) => {
   const testTask = {
     taskId: "test_" + Date.now(),
@@ -157,7 +161,7 @@ app.get("/test/python", async (req, res) => {
 
   try {
     // POST /start auf Python testen
-    const startResp = await axios.post(`${PYTHON_BACKEND}/start`, testTask);
+    const startResp = await axios.get(`${PYTHON_BACKEND}/test`, testTask);
 
     res.json({
       success: true,
