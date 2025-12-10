@@ -2,17 +2,12 @@
 // 1. KONFIGURATION
 // =================================================================
 
-// Verfügbare Farben pro Teil (Hex-Codes). Sie können hier weitere Farben hinzufügen.
-const partColors = {
-    head: ['#FF0000', '#808080', '#000000'], 
-    torso: ['#FF0000', '#808080', '#000000'], 
-    arms: ['#FF0000', '#808080', '#000000'], 
-    legs: ['#FF0000', '#808080', '#000000']
-};
-
 // Lesbare Namen für die Alert-Box (muss alle verwendeten Hex-Codes abdecken)
 const colorNames = {
-    '#FF0000': 'Rot', '#808080': 'Grau', '#000000': 'Schwarz'};
+    '#FF0000': 'Rot', '#808080': 'Grau', '#000000': 'Schwarz'
+};
+
+let colorsFromJson = {};
 
 // Speichert den aktuellen Index der Farbe für jedes Teil (Startwert)
 const currentColorsIndex = {
@@ -21,7 +16,6 @@ const currentColorsIndex = {
     arms: 0,
     legs: 0
 };
-
 
 // =================================================================
 // 2. HAUPTFUNKTIONEN (Farbwechsel)
@@ -35,8 +29,8 @@ function updateLegoFigure() {
     const partsToUpdate = ['head', 'torso', 'arms', 'legs'];
 
     partsToUpdate.forEach(part => {
-        // Die aktuelle Hex-Farbe abrufen
-        const hexColor = partColors[part][currentColorsIndex[part]];
+        // Die aktuelle Hex-Farbe abrufen (aus colorsFromJson)
+        const hexColor = colorsFromJson[part][currentColorsIndex[part]];
         
         // Das primäre SVG-Element einfärben
         const svgElement = document.getElementById(part);
@@ -68,7 +62,7 @@ function updateLegoFigure() {
 function changePartColor(part, direction) {
     console.log("changePartColor");
     let currentIndex = currentColorsIndex[part];
-    const colors = partColors[part];
+    const colors = colorsFromJson[part];
 
     if (direction === 'next') {
         // Gehe zum nächsten Index (Modulofunktion für kreisförmiges Wechseln)
@@ -82,13 +76,40 @@ function changePartColor(part, direction) {
     updateLegoFigure(); // Aktualisiert die Ansicht sofort
 }
 
+// =================================================================
+// FARBEN AUS JSON LADEN
+// =================================================================
+
+async function loadColorsFromJson() {
+    try {
+        console.log('Starte Laden von colors.json...');
+        const response = await fetch('../data/colors.json');
+        console.log('Response Status:', response.status);
+        
+        if (!response.ok) throw new Error('JSON nicht gefunden (Status: ' + response.status + ')');
+        
+        colorsFromJson = await response.json();
+        console.log('Farben erfolgreich geladen:', colorsFromJson);
+        
+        // Prüfe ob die Daten korrekt sind
+        if (!colorsFromJson.head || colorsFromJson.head.length === 0) {
+            throw new Error('colors.json hat ungültige Struktur');
+        }
+    } catch (err) {
+        console.error('Fehler beim Laden der colors.json:', err);
+        alert('FEHLER: colors.json konnte nicht geladen werden!\n\n' + err.message);
+    }
+}
 
 // =================================================================
 // 3. EVENTS (Laden und Bestellen)
 // =================================================================
 
-// Stellt sicher, dass das Bild beim Laden der Seite initialisiert wird
-document.addEventListener('DOMContentLoaded', updateLegoFigure);
+// Farben beim Laden der Seite initialisieren
+document.addEventListener('DOMContentLoaded', () => {
+    loadColorsFromJson();
+    updateLegoFigure();
+});
 
 // Event Listener für den "BESTELLEN"-Button
 const addToCartBtn = document.querySelector('.add-to-cart');
@@ -98,7 +119,7 @@ if (addToCartBtn) {
         const selectedConfig = {};
         for (const part in currentColorsIndex) {
             const index = currentColorsIndex[part];
-            const hexColor = partColors[part][index];
+            const hexColor = colorsFromJson[part][index];
             selectedConfig[part] = colorNames[hexColor];
         }
 
