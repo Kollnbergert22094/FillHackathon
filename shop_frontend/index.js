@@ -4,10 +4,12 @@
 
 // Lesbare Namen für die Alert-Box (muss alle verwendeten Hex-Codes abdecken)
 const colorNames = {
-    '#FF0000': 'Rot', '#808080': 'Grau', '#000000': 'Schwarz'
+    '#FF0000': 'rot',
+    '#000000': 'schwarz',
+    '#808080': 'grau'
 };
 
-let colorsFromJson = {};
+let colorsFromJson = {}
 
 // Speichert den aktuellen Index der Farbe für jedes Teil (Startwert)
 const currentColorsIndex = {
@@ -84,20 +86,35 @@ async function loadColorsFromJson() {
     try {
         console.log('Starte Laden von colors.json...');
         const response = await fetch('../data/colors.json');
-        console.log('Response Status:', response.status);
+        const response2 = await fetch('../data/parts.json');
         
-        if (!response.ok) throw new Error('JSON nicht gefunden (Status: ' + response.status + ')');
+        if (!response.ok) throw new Error('JSON nicht gefunden');
         
-        colorsFromJson = await response.json();
-        console.log('Farben erfolgreich geladen:', colorsFromJson);
+        const colors = await response.json();
+        console.log('Daten geladen:', colors);
+
         
-        // Prüfe ob die Daten korrekt sind
-        if (!colorsFromJson.head || colorsFromJson.head.length === 0) {
-            throw new Error('colors.json hat ungültige Struktur');
-        }
+        // Mapping von Namen zu Hex-Codes
+        const nameToHex = {
+            'rot': '#FF0000',
+            'schwarz': '#000000',
+            'grau': '#808080'
+        };
+        
+        // Extrahiere die Hex-Codes aus den Farbnamen
+        const hexCodes = colors.colors.map(c => nameToHex[c.name.toLowerCase()]);
+        
+        // Baue colorsFromJson: jedes Teil hat die gleichen Farben
+        colorsFromJson = {
+            head: hexCodes,
+            torso: hexCodes,
+            arms: hexCodes,
+            legs: hexCodes
+        };
+        
+        console.log('colorsFromJson:', colorsFromJson);
     } catch (err) {
-        console.error('Fehler beim Laden der colors.json:', err);
-        alert('FEHLER: colors.json konnte nicht geladen werden!\n\n' + err.message);
+        console.error('Fehler:', err);
     }
 }
 
@@ -105,32 +122,27 @@ async function loadColorsFromJson() {
 // 3. EVENTS (Laden und Bestellen)
 // =================================================================
 
-// Farben beim Laden der Seite initialisieren
-document.addEventListener('DOMContentLoaded', () => {
-    loadColorsFromJson();
+// Farben beim Laden der Seite initialisieren und Button-Listener danach registrieren
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadColorsFromJson();
     updateLegoFigure();
+
+    // Event Listener für den "BESTELLEN"-Button — jetzt erst nach DOM-Ready
+    const addToCartBtn = document.querySelector('.add-to-cart');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', () => {
+            // Sammelt die aktuelle Konfiguration
+            const selectedConfig = {};
+            for (const part in currentColorsIndex) {
+                const index = currentColorsIndex[part];
+                const hexColor = colorsFromJson[part][index];
+                // fallback: zeige hex, falls kein Name vorhanden
+                selectedConfig[part] = colorNames[hexColor] || hexColor;
+            }
+
+            // Öffnet build.html zusätzlich in einem neuen Tab/Fenster
+            const newWin = window.open('build.html', '_blank');
+            if (newWin) newWin.focus();
+        });
+    }
 });
-
-// Event Listener für den "BESTELLEN"-Button
-const addToCartBtn = document.querySelector('.add-to-cart');
-if (addToCartBtn) {
-    addToCartBtn.addEventListener('click', () => {
-        // Sammelt die aktuelle Konfiguration
-        const selectedConfig = {};
-        for (const part in currentColorsIndex) {
-            const index = currentColorsIndex[part];
-            const hexColor = colorsFromJson[part][index];
-            selectedConfig[part] = colorNames[hexColor];
-        }
-
-        // Ausgabe der Konfiguration (Simulation des Bestellvorgangs)
-        //alert('Ihre Bestellung wird vorbereitet. Gewählte Konfiguration:\n\n' + JSON.stringify(selectedConfig, null, 2));
-
-        // Optional: Logik zum Senden an den Server
-        // fetch('/api/order', { method: 'POST', body: JSON.stringify(selectedConfig) });
-
-        // Öffnet build.html zusätzlich in einem neuen Tab/Fenster
-        const newWin = window.open('build.html', '_blank');
-        if (newWin) newWin.focus();
-    });
-}
