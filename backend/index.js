@@ -9,11 +9,15 @@
   app.use(express.json());
 
   const AVG_BACKEND = process.env.PORT || "http://10.230.16.39:50587";
+  const PYTHON_BACKEND = process.env.PYTHON_BACKEND || "http://10.230.16.39:50587";
 
-  // Aufbewahrung aller Tasks
+
   const tasks = {}; // taskId -> { status, itemsToPick, result }
-  const taskQueue = []; // Queue für neue Tasks
+  const taskQueue = []; // queue neue Tasks
   let currentTaskId = null; 
+
+
+
 
   // --------------------------------------------
   // USER STARTET TASK
@@ -75,38 +79,60 @@
     }
   }
 
+
+
+
   // --------------------------------------------
   // NODE POLLT PYTHON BIS AGV FERTIG IST
   // --------------------------------------------
   async function pollPythonUntilDone(taskId) {
-    const task = tasks[taskId];
-    if (!task || task.polling) return;
+  const task = tasks[taskId];
+  if (!task || task.polling) return;
 
-    task.polling = true;
-    console.log("Starte Polling für", taskId);
+  task.polling = true;
+  console.log("Starte Polling für", taskId);
 
-    const interval = setInterval(async () => {
-      try {
-        const resp = await axios.get(`${PYTHON_BACKEND}/status`);
+  const interval = setInterval(async () => {
+    try {
+      const resp = await axios.get(`${PYTHON_BACKEND}/status`);
+      if (!resp.data || !resp.data.status) return;
 
-        if (!resp.data || !resp.data.status) return;
+      const pyStatus = resp.data.status;
 
-        if (resp.data.status === "done" || resp.data.status === "error") {
-          clearInterval(interval);
-          task.status = resp.data.status;
-          task.result = resp.data.result || null;
-          task.polling = false;
-          console.log("Task finished:", taskId);
-
-          currentTaskId = null;
-          startNextTask(); // nächsten Task starten
-        }
-
-      } catch (e) {
-        console.log("Polling Fehler:", e.message);
+      if (pyStatus === "working") {
+        task.status = "running";
+        return; // weiter pollen
       }
-    }, 2000);
-  }
+
+      if (pyStatus === "waiting") {
+        clearInterval(interval);
+        task.status = "done";
+        task.polling = false;
+        console.log("Task completed:", taskId);
+
+        currentTaskId = null;
+        startNextTask();
+        return;
+      }
+
+      if (pyStatus === "error") {
+        clearInterval(interval);
+        task.status = "error";
+        task.polling = false;
+
+        console.log("Task ERROR:", taskId);
+
+        currentTaskId = null;
+        startNextTask();
+        return;
+      }
+
+    } catch (e) {
+      console.log("Polling Fehler:", e.message);
+    }
+  }, 2000);
+}
+
 
 
 
@@ -119,8 +145,7 @@
     if (!task) return res.status(404).json({ error: "not found" });
 
     res.json({
-      status: task.status,
-      result: task.result
+      status: task.status
     });
   });
 
@@ -144,6 +169,10 @@
     res.json(runningTasks);
   });
 
+
+
+
+
   // --------------------------------------------
   // Worker Endpunkt: Teile für einen Task abrufen
   // GET /api/tasks/:id/items
@@ -159,9 +188,6 @@
       status: task.status
     });
   });
-
-
-
 
 
 
@@ -189,6 +215,7 @@
 
 
 
+
   // test funktionen 
 
   // test python verbindung
@@ -199,7 +226,6 @@
     };
 
     try {
-      // POST /start auf Python testen
       const startResp = await axios.get(`${PYTHON_BACKEND}/test`, testTask);
 
       res.json({
@@ -218,7 +244,6 @@
 
   // test start
  app.get('/api/task/start-dummy', (req, res) => {
-  // Dummy Items: Kombination aus partId + colorId
   const items = [
     { partId: 1, colorId: 1 },
     { partId: 2, colorId: 2 },

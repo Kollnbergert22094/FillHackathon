@@ -1,0 +1,25 @@
+{
+  "title": "Montageanleitung für dein Maskottchen",
+  "steps": [
+    {
+      "step": 1,
+      "text": "Rumpf vorbereiten: Rumpf auspacken, eventuelle Stützstrukturen entfernen.",
+      "image": "images/step1.png"
+    },
+    {
+      "step": 2,
+      "text": "Kopf aufsetzen: Kopf auf den Zapfen des Rumpfes stecken und leicht andrücken.",
+      "image": "images/step2.png"
+    },
+    {
+      "step": 3,
+      "text": "Arme einsetzen: Beide Arme in die vorgesehenen Öffnungen am Rumpf stecken.",
+      "image": "images/step3.png"
+    },
+    {
+      "step": 4,
+      "text": "Beine einsetzen: Beide Beine auf die Unterseite des Rumpfes stecken und prüfen, dass das Maskottchen stabil steht.",
+      "image": "images/step4.png"
+    }
+  ]
+}

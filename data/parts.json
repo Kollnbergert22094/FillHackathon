@@ -2,19 +2,19 @@
   "parts": [
     {
       "id": 1,
-      "name": "kopf"
+      "name": "head"
     },
     {
       "id": 2,
-      "name": "körper"
+      "name": "torso"
     },
     {
       "id": 3,
-      "name": "beine"
+      "name": "legs"
     },
     {
       "id": 4,
-      "name": "arme"
+      "name": "arms"
     }
   ]
 }
