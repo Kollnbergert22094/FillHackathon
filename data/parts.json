@@ -1,0 +1,20 @@
+{
+  "parts": [
+    {
+      "id": 1,
+      "name": "kopf"
+    },
+    {
+      "id": 2,
+      "name": "körper"
+    },
+    {
+      "id": 3,
+      "name": "beine"
+    },
+    {
+      "id": 4,
+      "name": "arme"
+    }
+  ]
+}
