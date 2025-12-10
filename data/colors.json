@@ -2,15 +2,15 @@
   "colors": [
     {
       "id": 1,
-      "name": "rot"
+      "name": "red"
     },
     {
       "id": 2,
-      "name": "schwarz"
+      "name": "black"
     },
     {
       "id": 3,
-      "name": "grau"
+      "name": "grey"
     }
   ]
 }
