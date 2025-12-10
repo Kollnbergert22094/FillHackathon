@@ -46,3 +46,51 @@ body {
     width: 100%; 
     height: 25px; 
 }
+
+.assembly_container {
+            width: 80%;
+            max-width: 500px; /* Gleiche Breite wie der Progress Bar Container */
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .assembly_title {
+            color: #314f72;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .assembly_step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .step_number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #b60000;
+            margin-right: 15px;
+            flex-shrink: 0;
+            line-height: 1.1;
+        }
+
+        .step_text {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .step_image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
