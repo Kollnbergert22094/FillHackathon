@@ -179,12 +179,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const selectedConfig = {};
             for (const part in currentColorsIndex) {
                 const partColors = colorsFromJson[part];
-                const index = currentColorsIndex[part];
-                selectedConfig[part] = partColors[index];
+                selectedConfig[part] = partColors;
             }
             
             console.log('Config:', selectedConfig);
             
+
+
             saveItems(selectedConfig)
             // // In JSON speichern
             // await saveItemToJson(selectedConfig);
