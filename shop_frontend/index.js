@@ -1,13 +1,6 @@
 // =================================================================
 // 1. KONFIGURATION
 // =================================================================
-
-const colorNames = {
-    '#FF0000': 'rot',
-    '#000000': 'schwarz',
-    '#808080': 'grau'
-};
-
 let colorsFromJson = {};
 
 const currentColorsIndex = {
@@ -22,29 +15,30 @@ const currentColorsIndex = {
 // =================================================================
 
 function updateLegoFigure() {
+    // Mapping: part -> dateipräfix (teilnummern in deinen Dateinamen)
+    const partPrefix = { head: 1, torso: 2, arms: 3, legs: 4 };
     const partsToUpdate = ['head', 'torso', 'arms', 'legs'];
 
     partsToUpdate.forEach(part => {
-        // Sichere Abfrage: falls colorsFromJson noch leer -> Fallback
         const partColors = colorsFromJson[part] || ['#000000'];
-        const hexColor = partColors[currentColorsIndex[part]] || '#000000';
-        
-        const svgElement = document.getElementById(part);
-        if (svgElement) {
-            svgElement.setAttribute('fill', hexColor);
+        const index = currentColorsIndex[part] % Math.max(1, partColors.length);
+        // variantIndex beginnt bei 1, also +1
+        const variantIndex = index + 1;
+        const prefix = partPrefix[part] || part;
+        const img = document.getElementById(part);
+        if (img) {
+            // Setze src auf passende Bilddatei. Beispiel: /data/images/1_2.png
+            img.src = `/data/images/${prefix}_${variantIndex}.png`;
         }
-        
-        if (part === 'legs') {
-             const svgElement2 = document.getElementById('legs-2');
-             if (svgElement2) {
-                 svgElement2.setAttribute('fill', hexColor);
-             }
-        }
+
+        // zweite Bild-Elemente (arms-2, legs-2) ebenfalls aktualisieren
         if (part === 'arms') {
-            const svgElement2 = document.getElementById('arms-2');
-            if (svgElement2) {
-                 svgElement2.setAttribute('fill', hexColor);
-            }
+            const img2 = document.getElementById('arms-2');
+            if (img2) img2.src = `/data/images/${partPrefix['arms']}_${variantIndex}.png`;
+        }
+        if (part === 'legs') {
+            const img2 = document.getElementById('legs-2');
+            if (img2) img2.src = `/data/images/${partPrefix['legs']}_${variantIndex}.png`;
         }
     });
 }
@@ -114,10 +108,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         addToCartBtn.addEventListener('click', () => {
             const selectedConfig = {};
             for (const part in currentColorsIndex) {
-                const index = currentColorsIndex[part];
                 const partColors = colorsFromJson[part] || ['#000000'];
-                const hexColor = partColors[index] || '#000000';
-                selectedConfig[part] = colorNames[hexColor] || hexColor;
+                selectedConfig[part] = partColors;
             }
 
             console.log('Config:', selectedConfig);

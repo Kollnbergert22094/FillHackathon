@@ -21,13 +21,20 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
+.image-grid {
+    position: relative; /* Wichtig für die absolute Positionierung der Kinder */
+    width: 300px; /* Beispielbreite, je nach Figur anpassen */
+    height: 400px; /* Beispielhöhe */
+    margin: 50px auto; /* Zentrierung des Containers, optional */
+}
 
 .controls-left, .controls-right {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-around; 
-    height: 300px; 
+    height: 350px;
+    margin-top: -110px;  /* Negative Margin nach oben */
 }
 
 .controls-left {
@@ -71,9 +78,11 @@ body {
 }
 
 .svg-container {
-    width: 100%;
-    max-width: 200px;
-    margin-bottom: 25px;
+    width: 200px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #lego-svg {
@@ -98,3 +107,60 @@ body {
     transform: scale(1.02);
 }
 
+.part {
+    position: absolute;
+}
+
+.head {
+    width: 100px;
+    height: 100px;
+    top: 0; 
+    left: 50%;
+    transform: translateX(-50%); /* Zentrierung */
+    z-index: 5; /* Soll vor Rumpf liegen */
+}
+
+.torso {
+    width: 100px;
+    height: 100px;
+    top: 120px; /* Beispielwert, unter den Kopf setzen */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+}
+
+.arms-left {
+    width: 100px;
+    height: 100px;
+    top: 120px;
+    left: -5%;
+    transform: translateX(0);
+    z-index: 2;
+}
+
+.arms-right {
+    width: 100px;
+    height: 100px;
+    top: 120px;
+    right: -5%;
+    transform: translateX(0);
+    z-index: 2;
+}
+
+.legs-left {
+    width: 100px;
+    height: 100px;
+    top: 240px;
+    left: 15%;
+    transform: translateX(0);
+    z-index: 2; /* Hinter dem Rumpf, falls sie überlappen */
+}
+
+.legs-right {
+    width: 100px;
+    height: 100px;
+    top: 240px;
+    right: 15%;
+    transform: translateX(0);
+    z-index: 2;
+}
