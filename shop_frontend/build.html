@@ -7,44 +7,40 @@
     <link rel="stylesheet" href="build.css">
 </head>
 <body>
+
+<div class="main_wrapper">
+
     <div class="progress_bar_container">
-        <label for="progress_bar" class="progress_bar_label">Fortschritt der Bestellung</label>
-        <progress id="progress_bar" value="2" max="5"></progress>
-    </div>
+        <label class="progress_bar_label">Dein Bestellstatus</label>
+        <div id="status_stepper">
+            <div class="step finished">
+                <div class="icon_circle">1</div>
+                <div class="step_title">Bestellt</div>
+            </div>
+            
+            <div class="step_line active"></div>
+
+            <div class="step current">
+                <div class="icon_circle">2</div>
+                <div class="step_title">Bearbeitung</div>
+            </div>
+            
+            <div class="step_line"></div>
+
+            <div class="step">
+                <div class="icon_circle">3</div>
+                <div class="step_title">Zugestellt</div>
+            </div>
+        </div>
+</div>
 
     <div class="assembly_container">
-        <h2 class="assembly_title">Montageanleitung für dein Maskottchen</h2>
-        
-        <div class="assembly_step">
-            <div class="step_number">1</div>
-            <div>
-                <p class="step_text">Rumpf vorbereiten: Rumpf auspacken, eventuelle Stützstrukturen entfernen. </p>
-                </div>
-        </div>
-        
-        <div class="assembly_step">
-            <div class="step_number">2</div>
-            <div>
-                <p class="step_text">Kopf aufsetzen: Kopf auf den Zapfen des Rumpfes stecken und leicht andrücken. </p>
-                </div>
-        </div>
-        
-        <div class="assembly_step">
-            <div class="step_number">3</div>
-            <div>
-                <p class="step_text">Arme einsetzen: Beide Arme in die vorgesehenen Öffnungen am Rumpf stecken. </p>
-                </div>
-        </div>
-
-        <div class="assembly_step">
-            <div class="step_number">4</div>
-            <div>
-                <p class="step_text">Beine einsetzen: Beide Beine auf die Unterseite des Rumpfes stecken und prüfen, dass das Maskottchen stabil steht. </p>
-                </div>
-        </div>
-
+        <h2 id="assembly_title" class="assembly_title"></h2>
+        <div id="assembly_steps"></div>
     </div>
-    
-    <script src="index.js"></script>
+
+</div>
+
+<script src="index.js"></script>
 </body>
 </html>
