@@ -31,7 +31,7 @@ const partIdMapping = {
     head: 1,
     torso: 2,
     arms: 3,
-    legs: 5 
+    legs: 4
     // ACHTUNG: Basierend auf deiner bisherigen Logik. 
     // Wenn 'legs' im Ziel-JSON '4' sein soll, ändere dies zu 4.
 }
@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', async () => {
             const selectedConfig = {};
+            const colorsId = {};
             for (const part in currentColorsIndex) {
                 const partColors = colorsFromJson[part];
                 selectedConfig[part] = partColors;
@@ -200,7 +201,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Config:', selectedConfig);
             
             
-            const items = transformConfigToOrderFormat(colorMapping);
+            const items = transformConfigToOrderFormat(colorsId);
+            console.log(items);
 
             saveItems(items)
             // // In JSON speichern
