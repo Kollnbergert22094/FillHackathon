@@ -143,13 +143,6 @@ async function loadColorsFromJson() {
         const colors = await response.json();
         console.log('Daten geladen:', colors);
 
-        const nameToHex = {
-            'red': '#FF0000',
-            'black': '#000000',
-            'grey': '#808080'
-        };
-        
-        const hexCodes = colors.colors.map(c => nameToHex[c.name.toLowerCase()]);
         console.log('Hex-Codes:', hexCodes);
         
         colorsFromJson = {
@@ -178,13 +171,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         addToCartBtn.addEventListener('click', async () => {
             const selectedConfig = {};
             for (const part in currentColorsIndex) {
-                const partColors = colorsFromJson[part] || ['#000000'];
+                const partColors = colorsFromJson[part];
                 const index = currentColorsIndex[part];
                 selectedConfig[part] = partColors[index];
             }
             
             console.log('Config:', selectedConfig);
             
+            saveItems(selectedConfig)
             // // In JSON speichern
             // await saveItemToJson(selectedConfig);
             
@@ -219,7 +213,27 @@ async function saveTaskIdToJson(taskId) {
 }
 
 
+async function saveItems(items) {
+    try {
+        const response = await fetch(BACKEND + '/api/save-items', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(items) // Backend erwartet { taskId }
+        });
 
+        if (!response.ok) {
+            throw new Error(`HTTP Fehler! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Items gespeichert:', result);
+
+    } catch (err) {
+        console.error('Fehler beim Speichern der Items:', err);
+    }
+}
 
 
 
