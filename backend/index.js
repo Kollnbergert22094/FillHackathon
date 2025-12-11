@@ -18,7 +18,42 @@
   let currentTaskId = null; 
 
 
+app.post('/api/save-item', async (req, res) => {
+    console.log('--- POST-Request empfangen ---');
+    const itemData = req.body; // Die vom Client gesendeten JSON-Daten (req.body ist bereits das JS-Objekt)
+    
+    // Validierung (optional, aber empfohlen)
+    if (!itemData || Object.keys(itemData).length === 0) {
+        return res.status(400).json({ success: false, message: 'Keine Daten im Body gefunden.' });
+    }
 
+    // Erstelle einen Zeitstempel für den Dateinamen
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `config_${timestamp}.json`;
+    const filePath = path.join(__dirname, 'saved_configs', filename); // Pfad zur Speicherdatei
+
+    try {
+        // Sicherstellen, dass das Verzeichnis existiert
+        await fs.mkdir(path.join(__dirname, 'saved_configs'), { recursive: true });
+
+        // Daten als formatierten JSON-String in die Datei schreiben
+        // Der zweite Parameter (null) und der dritte (2) sorgen für schöne Einrückung
+        await fs.writeFile(filePath, JSON.stringify(itemData, null, 2), 'utf8');
+
+        console.log(`✅ Konfiguration erfolgreich gespeichert als: ${filename}`);
+        
+        // Antwort an den Client senden
+        res.status(200).json({ 
+            success: true, 
+            message: 'Konfiguration erfolgreich gespeichert.', 
+            filename: filename 
+        });
+
+    } catch (error) {
+        console.error('❌ Fehler beim Speichern der Datei:', error);
+        res.status(500).json({ success: false, message: 'Fehler beim Speichern auf dem Server.' });
+    }
+});
 
   // --------------------------------------------
   // USER STARTET TASK

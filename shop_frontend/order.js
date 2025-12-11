@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Config:', selectedConfig);
             
             // In JSON speichern
+            await saveItemToJson(selectedConfig);
             
             const newWin = window.open('build.html', '_blank');
             if (newWin) newWin.focus();
