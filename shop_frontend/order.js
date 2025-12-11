@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const partColors = colorsFromJson[part] || ['#000000'];
                 selectedConfig[part] = partColors;
             }
-
+            
             console.log('Config:', selectedConfig);
             const newWin = window.open('build.html', '_blank');
             if (newWin) newWin.focus();

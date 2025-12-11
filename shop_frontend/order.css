@@ -24,8 +24,8 @@ body {
 .image-grid {
     position: relative; /* Wichtig für die absolute Positionierung der Kinder */
     width: 300px; /* Beispielbreite, je nach Figur anpassen */
-    height: 400px; /* Beispielhöhe */
-    margin: 50px auto; /* Zentrierung des Containers, optional */
+    height: 100%; /* Beispielhöhe */
+    margin: 100px auto; /* Zentrierung des Containers, optional */
 }
 
 .controls-left, .controls-right {
@@ -93,13 +93,18 @@ body {
 
 .add-to-cart {
     border: 0;
-    background-color: #ed1c24; 
+    background-color: #ed1c24;
     color: white;
     padding: 15px 40px;
-    font-size: 1.4em;
+    font-size: clamp(1rem, 2.5vw, 1.4rem); /* skaliert mit Viewport */
     font-weight: bold;
     border-radius: 5px;
     text-transform: uppercase;
+    width: 100%;
+    max-width: 360px; /* begrenzt auf größeren Bildschirmen */
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
 }
 
 .add-to-cart:hover {
