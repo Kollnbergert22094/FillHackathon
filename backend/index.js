@@ -308,3 +308,14 @@ app.post('/api/save-task-id', (req, res) => {
     
   console.log("Write in json " + taskId);
 });
+
+
+app.post('/api/sabe-items', (req, res) => {
+  const items = req.body;
+  const fs =require('fs');
+
+  fs.writeFile('../data/items.json', JSON.stringify(items), (err) => {
+    if (err) return res.status(500).json({ error: 'Fehler beim Speichern' });
+        res.json({ message: 'Task-ID gespeichert' });
+  })
+});

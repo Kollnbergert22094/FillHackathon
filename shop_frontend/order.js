@@ -143,6 +143,13 @@ async function loadColorsFromJson() {
         const colors = await response.json();
         console.log('Daten geladen:', colors);
 
+        const nameToHex = {
+            'red': '#FF0000',
+            'black': '#000000',
+            'grey': '#808080'
+        };
+        
+        const hexCodes = colors.colors.map(c => nameToHex[c.name.toLowerCase()]);
         console.log('Hex-Codes:', hexCodes);
         
         colorsFromJson = {
