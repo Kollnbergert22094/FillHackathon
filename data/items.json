@@ -1,1 +1,5 @@
-{"items":[{"partId":1},{"partId":2},{"partId":3},{"partId":4}]}
+{"items":[
+    { "partId": 1, "colorId": 1 },
+    { "partId": 2, "colorId": 2 },
+    { "partId": 4, "colorId": 3 } 
+]}
