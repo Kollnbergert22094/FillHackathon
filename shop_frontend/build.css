@@ -3,94 +3,232 @@ body {
     padding: 20px;
     background-color: #314f72;
     margin: 0;
-    
-    display: flex; 
-    justify-content: center; 
-    align-items: flex-start; 
-    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     width: 100%;
 }
 
-.progress_bar_container {
-    margin-bottom: 20px; 
-    margin-top: 50px; 
-    width: 80%; 
-    max-width: 500px; 
-    
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px; 
-    padding: 20px; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+.main_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
+
+
+
+
+
+
+
+
+/* ============================================================
+   Progress Box (JETZT: Stepper/Timeline)
+   ============================================================ */
+.progress_bar_container {
+    margin: 10px 0;
+    width: 90%; /* Etwas breiter, damit die Steps Platz haben */
+    max-width: 800px; /* Max-Breite erhöhen */
+
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px 30px; /* Etwas mehr horizontaler Platz */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .progress_bar_label {
     color: #b60000;
     font-weight: bold;
-    margin-bottom: 10px; 
-    font-size: 1.2rem; 
-    text-align: center; 
-    width: 100%; 
+    margin-bottom: 20px;
+    font-size: 1.2rem;
 }
 
-#progress_bar {
-    background-color: #e0e0e0; 
-    border: 1px solid #aaa; 
-    border-radius: 8px; 
-    overflow: hidden; 
-    width: 100%; 
-    height: 25px; 
+/* ----------------------------------------------------------- */
+/* NEUE STYLES FÜR DEN STEPPER */
+/* ----------------------------------------------------------- */
+#status_stepper {
+    display: flex;
+    align-items: flex-start; /* Icons und Linien horizontal ausrichten */
+    justify-content: space-between;
+    width: 100%;
 }
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-basis: 0;
+    flex-grow: 1; /* Schritte nehmen gleich viel Platz ein */
+}
+
+.icon_circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #777;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    z-index: 10; /* Über der Linie */
+    border: 3px solid #fff;
+    transition: all 0.3s ease;
+}
+
+.step_title {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #777;
+    font-weight: 500;
+}
+
+/* STYLING FÜR AKTIVE/FERTIGE SCHRITTE */
+.step.finished .icon_circle {
+    background-color: #4CAF50; /* Grün für fertig */
+    color: #fff;
+    box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+.step.current .icon_circle {
+    background-color: #b60000; /* Rot für aktuell */
+    color: #fff;
+    transform: scale(1.15); /* Hebt den aktuellen Step hervor */
+    box-shadow: 0 0 0 5px rgba(182, 0, 0, 0.3);
+}
+
+.step.current .step_title {
+    color: #b60000;
+    font-weight: bold;
+}
+
+/* VERBINDUNGSLINIE */
+.step_line {
+    flex-grow: 1;
+    height: 4px;
+    background-color: #e0e0e0;
+    margin: 15px -15px 0 -15px; /* Mittig zwischen den Icons */
+    transition: background-color 0.3s ease;
+}
+
+.step_line.active {
+    background-color: #b60000; /* Aktive Linie in Akzentfarbe */
+}
+
+/* Entferne alte Progress Bar Styles, falls noch vorhanden */
+#progress_bar { 
+    display: none; 
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(182, 0, 0, 0.4);
+        transform: scale(1.15);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(182, 0, 0, 0);
+        transform: scale(1.15); /* Behält die Skalierung bei */
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(182, 0, 0, 0);
+        transform: scale(1.15);
+    }
+}
+
+/* Wende die Animation auf das Icon im aktuellen Step an */
+.step.current .icon_circle {
+    /* Vorhandene Styles */
+    background-color: #b60000; /* Rot für aktuell */
+    color: #fff;
+    transform: scale(1.15); /* Hebt den aktuellen Step hervor */
+    
+    /* NEU: Animation hinzufügen */
+    animation: pulse 1.5s infinite;
+}
+
+
+
+
+
+
+
+
 
 .assembly_container {
-            width: 80%;
-            max-width: 500px; /* Gleiche Breite wie der Progress Bar Container */
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
+    width: 95%;
+    max-width: 1100px;
+    background-color: #fff;
+    border-radius: 14px;
+    padding: 30px 35px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+    margin: 15px 0;
+}
 
-        .assembly_title {
-            color: #314f72;
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-            text-align: center;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
+#assembly_steps {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 30px;
+}
 
-        .assembly_step {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
+.assembly_title {
+    width: 100%;
+    color: #b60000;
+    font-size: 1.6rem;
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e6e6e6;
+    font-weight: 700;
+}
 
-        .step_number {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #b60000;
-            margin-right: 15px;
-            flex-shrink: 0;
-            line-height: 1.1;
-        }
+.assembly_step {
+    width: calc(50% - 55px);
+    padding: 20px;
+    border-radius: 12px;
+    background-color: #fafafa;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 0;
+}
 
-        .step_text {
-            font-size: 1rem;
-            line-height: 1.5;
-        }
+.step_top {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+    gap: 20px;
+}
 
-        .step_image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
+.step_number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #b60000;
+    min-width: 32px;
+    text-align: left;
+}
+
+.step_text {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 500;
+    flex: 1;
+    text-align: left;
+}
+
+.step_image {
+    display: block;
+    margin: 15px auto 0 auto;
+    width: 85%;
+    max-width: 350px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}

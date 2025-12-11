@@ -8,6 +8,10 @@ const colorNames = {
     '#808080': 'grau'
 };
 
+// Variable zur Steuerung des Bestellstatus (für den Stepper)
+// 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
+let currentOrderStatus = 2; 
+
 let colorsFromJson = {};
 
 const currentColorsIndex = {
@@ -18,7 +22,7 @@ const currentColorsIndex = {
 };
 
 // =================================================================
-// 2. HAUPTFUNKTIONEN (Farbwechsel)
+// 2. HAUPTFUNKTIONEN (Farbwechsel und Stepper)
 // =================================================================
 
 function updateLegoFigure() {
@@ -43,7 +47,7 @@ function updateLegoFigure() {
         if (part === 'arms') {
             const svgElement2 = document.getElementById('arms-2');
             if (svgElement2) {
-                 svgElement2.setAttribute('fill', hexColor);
+                svgElement2.setAttribute('fill', hexColor);
             }
         }
     });
@@ -63,6 +67,43 @@ function changePartColor(part, direction) {
     currentColorsIndex[part] = currentIndex;
     console.log("Neuer Index für", part, ":", currentIndex, "Farbe:", colors[currentIndex]);
     updateLegoFigure();
+}
+
+/**
+ * Aktualisiert den visuellen Status-Stepper basierend auf dem aktuellen Schritt.
+ * @param {number} currentStepNumber - Die Nummer des aktuell aktiven Schritts (z.B. 2).
+ */
+function updateStepperStatus(currentStepNumber) {
+    console.log("Aktualisiere Stepper auf Schritt:", currentStepNumber);
+    const stepper = document.getElementById('status_stepper');
+    if (!stepper) return;
+
+    // 1. Alle Steps und Linien zurücksetzen
+    const steps = stepper.querySelectorAll('.step');
+    const lines = stepper.querySelectorAll('.step_line');
+
+    steps.forEach((step, index) => {
+        const stepNum = index + 1; // Schritte starten bei 1
+        step.classList.remove('finished', 'current');
+        
+        if (stepNum < currentStepNumber) {
+            // Schritte, die VOR dem aktuellen Schritt liegen, sind 'finished'
+            step.classList.add('finished');
+        } else if (stepNum === currentStepNumber) {
+            // Der aktuelle Schritt ist 'current'
+            step.classList.add('current');
+        }
+    });
+    
+    lines.forEach((line, index) => {
+        const lineNum = index + 1;
+        line.classList.remove('active');
+        
+        if (lineNum < currentStepNumber) {
+            // Linien vor dem aktuellen Schritt sind 'active'
+            line.classList.add('active');
+        }
+    });
 }
 
 // =================================================================
@@ -108,6 +149,9 @@ async function loadColorsFromJson() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadColorsFromJson();
     updateLegoFigure();
+    
+    // Stepper Status beim Laden aktualisieren
+    updateStepperStatus(currentOrderStatus); 
 
     const addToCartBtn = document.querySelector('.add-to-cart');
     if (addToCartBtn) {
@@ -126,3 +170,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
+
+// =================================================================
+// Füge montageanleitung hinzu
+// =================================================================
+
+fetch("../data/assemblyInstructions.json")
+    .then(response => response.json())
+    .then(data => {
+        // Titel setzen
+        document.getElementById("assembly_title").textContent = data.title;
+
+        const stepsContainer = document.getElementById("assembly_steps");
+        stepsContainer.innerHTML = ""; 
+
+        data.steps.forEach(step => {
+            const stepElement = document.createElement("div");
+            stepElement.classList.add("assembly_step");
+
+            stepElement.innerHTML = `
+                <div class="step_top">
+                    <div class="step_number">${step.step}</div>
+                    <div class="step_text">${step.text}</div>
+                </div>
+                <img class="step_image" src="../data/${step.image}" alt="Schritt ${step.step}">
+            `;
+            stepsContainer.appendChild(stepElement);
+        });
+    })
+    .catch(err => console.error("Fehler beim Laden der JSON:", err));
