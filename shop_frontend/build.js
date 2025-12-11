@@ -12,7 +12,7 @@ const colorNames = {
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
-let currentOrderStatus = 2; 
+let currentOrderStatus = 1; 
 let currentTaskId = null; 
 let pollingInterval = null;
 

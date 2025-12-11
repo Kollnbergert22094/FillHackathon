@@ -10,7 +10,7 @@
   app.use(cors());
   app.use(express.json());
 
-  const AVG_BACKEND = process.env.PORT || "http://10.230.16.39:50587";
+  const AVG_BACKEND = process.env.AVG_BACKEND || "http://10.230.18.52:50587";
 
 
   const tasks = {}; // taskId -> { status, itemsToPick, result }
@@ -45,7 +45,7 @@
     console.log("Task created:", taskId);
 
     if (!currentTaskId) {
-      // startTask(newTask);
+      startTask(newTask);
     } else {
       taskQueue.push(newTask);
       console.log("Task queued:", taskId);
@@ -95,7 +95,7 @@
 
   const interval = setInterval(async () => {
     try {
-      const resp = await axios.get(`${AVG_BACKEND}/status`);
+      const resp = await axios.get(`${AVG_BACKEND}/status`, { params: { taskId } });
       if (!resp.data || !resp.data.status) return;
 
       const pyStatus = resp.data.status;
