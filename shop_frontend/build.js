@@ -9,12 +9,15 @@ const colorNames = {
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
-let currentOrderStatus = 4; 
+let currentOrderStatus = 2; 
+let currentTaskId = null; 
+let pollingInterval = null;
 
 
 /**
  * Aktualisiert den visuellen Status-Stepper basierend auf dem aktuellen Schritt.
- * @param {number} currentStepNumber - Die Nummer des aktuell aktiven Schritts (z.B. 2).
+ * (Wiederherstellung der robusten Logik)
+ * @param {number} currentStepNumber - Die Nummer des aktuell aktiven Schritts (z.B. 3).
  */
 function updateStepperStatus(currentStepNumber) {
     console.log("Aktualisiere Stepper auf Schritt:", currentStepNumber);
@@ -24,31 +27,27 @@ function updateStepperStatus(currentStepNumber) {
     const steps = stepper.querySelectorAll('.step');
     const lines = stepper.querySelectorAll('.step_line');
 
-    // Schritte zurücksetzen
     steps.forEach((step, index) => {
-        step.classList.remove('finished', 'current');
         const stepNum = index + 1;
-        if (stepNum < currentStepNumber) step.classList.add('finished');
-        else if (stepNum === currentStepNumber) step.classList.add('current');
+        step.classList.remove('finished', 'current');
+        if (stepNum < currentStepNumber) {
+            step.classList.add('finished');
+        } else if (stepNum === currentStepNumber) {
+            step.classList.add('current');
+        }
     });
 
-    // Linien zurücksetzen
-    lines.forEach(line => line.classList.remove('active', 'finished'));
-
-    // Hardcodierte Linien
-    if (currentStepNumber > 2) {
-        lines[0].classList.add('finished'); // Linie 1 grün, wenn Step 2 fertig
-    }
-    if (currentStepNumber > 3) {
-        lines[1].classList.add('finished'); // Linie 2 grün, wenn Step 3 fertig
-    }
-
-    // Linie zum aktuellen Step rot
-    if (currentStepNumber === 2) {
-        lines[0].classList.add('active');
-    } else if (currentStepNumber === 3) {
-        lines[1].classList.add('active');
-    }
+    lines.forEach((line, index) => {
+        const lineNum = index + 1;
+        line.classList.remove('active', 'finished'); 
+        
+        if (lineNum + 1 < currentStepNumber) {
+             line.classList.add('finished');
+        } 
+        else if (lineNum < currentStepNumber) {
+            line.classList.add('active');
+        }
+    });
 }
 
 
@@ -90,7 +89,65 @@ async function loadColorsFromJson() {
     }
 }
 
+// =================================================================
+// TASK POLLING
+// =================================================================
+function startPollingTask(taskId) {
+    currentTaskId = taskId;
+    if (pollingInterval) clearInterval(pollingInterval);
 
+    pollingInterval = setInterval(async () => {
+        try {
+            const resp = await fetch(`/api/task/${taskId}/status`);
+            const data = await resp.json();
+            if (!data?.status) return;
+
+            switch(data.status) {
+                case 'pending': currentOrderStatus = 1; break;
+                case 'running': currentOrderStatus = 2; break;
+                case 'done':
+                    currentOrderStatus = 4;
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                    break;
+                case 'error':
+                    currentOrderStatus = 1;
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                    alert('Task ist fehlgeschlagen!');
+                    break;
+            }
+
+            updateStepperStatus(currentOrderStatus);
+        } catch (err) {
+            console.error('Polling Fehler:', err);
+        }
+    }, 2000);
+}
+
+
+// =================================================================
+// ACTUAL TASK START
+// =================================================================
+async function startTaskFrontend(items) {
+    try {
+        const resp = await fetch('/api/task/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(items)
+        });
+        const data = await resp.json();
+
+        if (data.taskId) {
+            console.log('Task gestartet:', data.taskId);
+            startPollingTask(data.taskId);
+        } else {
+            console.error('Fehler beim Starten des Tasks', data);
+        }
+    } catch (err) {
+        console.error('Fehler beim Starten des Tasks:', err);
+    }
+}
 
 // =================================================================
 // 3. EVENTS (Laden und Bestellen)
@@ -99,6 +156,14 @@ async function loadColorsFromJson() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadColorsFromJson();
     updateStepperStatus(currentOrderStatus);
+
+    const items = [
+        { partId: 1, colorId: 1 },
+        { partId: 2, colorId: 2 },
+        { partId: 4, colorId: 3 }
+    ];
+    
+    startTaskFrontend(items);
 });
 
 

@@ -29,10 +29,10 @@ body {
    ============================================================ */
 .order_state_container {
     
-    width: 95%;
-    max-width: 1100px;
+    width: 90%;
+    max-width: 1200px;  
     margin: 10px 0;
-    max-width: 800px; /* Max-Breite erhöhen */
+    max-width: 800px;
 
     background-color: #fff;
     border-radius: 12px;
@@ -114,21 +114,57 @@ body {
     font-weight: bold;
 }
 
-/* VERBINDUNGSLINIE */
+/* ============================================================
+   STEP-LINE STYLES
+   ============================================================ */
+
 .step_line {
     flex-grow: 1;
-    height: 4px;    
+    height: 5px;
+    border-radius: 3px;
     background-color: #e0e0e0;
-    margin: 15px -15px 0 -15px; /* Mittig zwischen den Icons */
+    margin: 15px -15px 0 -15px;
     transition: background-color 0.3s ease;
+    animation: none; /* Animation standardmäßig deaktivieren */
 }
 
 .step_line.active {
-    background-color: #b60000; /* Aktive Linie in Akzentfarbe */
+    /* Gradient für sanften Sweep */
+    background: linear-gradient(
+        to right,
+        #b60000 0%,
+        #ff4d4d 20%,
+        #b60000 40%,
+        #b60000 100%
+    );
+    background-size: 200% 100%; /* doppelte Breite für Scroll-Effekt */
+    animation: line-sweep 2s linear infinite; /* langsamer und smoother */
+}
+
+@keyframes line-sweep {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: -100% 0;
+    }
 }
 
 .step_line.finished {
     background-color: #4CAF50; /* Grün für fertige Linie */
+    animation: none; /* Animation explizit deaktivieren, wenn fertig */
+}
+
+/* ============================================================
+   ICON ANIMATION FÜR AKTUELLEN STEP
+   ============================================================ */
+
+.step.current .icon_circle {
+    background-color: #b60000;
+    color: #fff;
+    transform: scale(1.15);
+    box-shadow: 0 0 0 5px rgba(182, 0, 0, 0.3);
+    animation: pulse 1.5s infinite; /* Pulsierende Animation für Icon */
 }
 
 
@@ -139,13 +175,14 @@ body {
     }
     70% {
         box-shadow: 0 0 0 10px rgba(182, 0, 0, 0);
-        transform: scale(1.15); /* Behält die Skalierung bei */
+        transform: scale(1.15);
     }
     100% {
         box-shadow: 0 0 0 0 rgba(182, 0, 0, 0);
         transform: scale(1.15);
     }
 }
+
 
 /* Wende die Animation auf das Icon im aktuellen Step an */
 .step.current .icon_circle {
@@ -167,11 +204,11 @@ body {
 
 
 .assembly_container {
-    width: 95%;
-    max-width: 1100px;
+    width: 90%;
+    max-width: 1200px;
     background-color: #fff;
     border-radius: 14px;
-    padding: 30px 35px;
+    padding: 25px 35px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
     margin: 15px 0;
 }
@@ -180,6 +217,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+    justify-content: center;
     gap: 30px;
 }
 
@@ -194,7 +232,7 @@ body {
 }
 
 .assembly_step {
-    width: calc(50% - 55px);
+    width: calc(50% - 100px);
     padding: 20px;
     border-radius: 12px;
     background-color: #fafafa;
