@@ -184,9 +184,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             console.log('Config:', selectedConfig);
             
+            
+            const items = transformConfigToOrderFormat();
 
-
-            saveItems(selectedConfig)
+            saveItems(items)
             // // In JSON speichern
             // await saveItemToJson(selectedConfig);
             
@@ -281,4 +282,32 @@ async function startTaskFrontend() {
     } catch (err) {
         console.error('Fehler beim Laden/Starten des Tasks:', err);
     }
+}
+
+
+function transformConfigToOrderFormat(colorsIndex) {
+    const items = [];
+
+    // Iteriere über jedes Teil im partIdMapping, um die Reihenfolge sicherzustellen
+    for (const partName in partIdMapping) {
+        
+        // Hole die Part ID aus dem Mapping
+        const partId = partIdMapping[partName];
+        
+        // Hole den Farb-Index aus dem Eingabeobjekt
+        const colorIndex = colorsIndex[partName]; 
+        
+        // Die Color ID ist der Index + 1 (typisch für 1-basierte IDs im Backend)
+        const colorId = colorIndex + 1; 
+
+        // Füge das neue Item zum Array hinzu
+        items.push({
+            partId: partId,
+            colorId: colorId
+        });
+    }
+
+    return {
+        items: items
+    };
 }
