@@ -10,8 +10,10 @@
   app.use(cors());
   app.use(express.json());
 
-  // const AVG_BACKEND = process.env.AVG_BACKEND || "http://10.230.16.39:50587";
-  const AVG_BACKEND = process.env.AVG_BACKEND || "http://192.168.4.2:50587";
+  // const AVG_BACKEND = "http://10.230.16.39:50587";
+  // const AVG_BACKEND = "http://10.230.18.52:50587";
+  // const AVG_BACKEND = "http://192.168.4.4:50587";
+  const AVG_BACKEND = "http://localhost:50587";
 
 
   const tasks = {}; // taskId -> { status, itemsToPick, result }
@@ -216,7 +218,6 @@
     if (!task) return res.status(404).json({ error: "Task not found" });
 
     res.json({
-      taskId: req.params.id,
       taskId: req.params.id,
       items: task.itemsToPick,
       status: task.status

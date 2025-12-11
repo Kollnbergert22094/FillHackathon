@@ -7,8 +7,9 @@ const colorNames = {
     '#000000': 'schwarz',
     '#808080': 'grau'
 };
-// const BACKEND = "http://192.168.4.8:3000";
-const BACKEND = "http://10.230.18.52:3000";
+// const BACKEND = "http://192.168.4.6:3000";
+// const BACKEND = "http://10.230.18.52:3000";
+const BACKEND = "http://localhost:3000";
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
@@ -32,15 +33,23 @@ const currentColorsIndex = {
 const partIdMapping = {
     head: 1,
     torso: 2,
-    arms: 3,
-    legs: 4
+    legs: 3,
+    arms: 4
     // ACHTUNG: Basierend auf deiner bisherigen Logik. 
     // Wenn 'legs' im Ziel-JSON '4' sein soll, ändere dies zu 4.
 }
 const colorMapping = {
-    grey: 1,
-    black: 2
+    red: 1,
+    black: 2,
+    grey: 3
 }
+
+const selectedColorNames = {
+    head: "black",
+    torso: "black",
+    arms: "black",
+    legs: "black"
+};
 
 // =================================================================
 // 2. HAUPTFUNKTIONEN (Farbwechsel)
@@ -87,6 +96,11 @@ function changePartColor(part, direction) {
     }
     console.log(colors)
     currentColorsIndex[part] = currentIndex;
+
+    // 🔥 Farbname speichern (z. B. "red", "black", "grey")
+    selectedColorNames[part] = colors;
+
+    
     console.log("Neuer Index für", part, ":", currentIndex, "Farbe:", colors[currentIndex]);
     updateLegoFigure();
 }
@@ -315,29 +329,24 @@ async function startTaskFrontend() {
 }
 
 
-function transformConfigToOrderFormat(colorsIndex) {
+function transformConfigToOrderFormat() {
     const items = [];
 
-    // Iteriere über jedes Teil im partIdMapping, um die Reihenfolge sicherzustellen
     for (const partName in partIdMapping) {
-        
-        // Hole die Part ID aus dem Mapping
-        const partId = partIdMapping[partName];
-        
-        // Hole den Farb-Index aus dem Eingabeobjekt
-        const colorIndex = colorsIndex[partName]; 
-        
-        // Die Color ID ist der Index + 1 (typisch für 1-basierte IDs im Backend)
-        const colorId = colorIndex; 
 
-        // Füge das neue Item zum Array hinzu
+        const partId = partIdMapping[partName];
+
+        // Farbe holen
+        const colorName = selectedColorNames[partName];
+
+        // Mapping zur ID
+        const colorId = colorMapping[colorName];
+
         items.push({
             partId: partId,
             colorId: colorId
         });
     }
 
-    return {
-        items: items
-    };
+    return { items };
 }

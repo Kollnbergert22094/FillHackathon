@@ -1,0 +1,1 @@
+ip in shop_frontend/order.js, shop_frontend/build.js, worker_frontend/index.html, backend/index.js ändern
