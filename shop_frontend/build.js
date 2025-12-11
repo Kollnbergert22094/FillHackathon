@@ -1,5 +1,3 @@
-import fs from 'fs/promises';
-
 const BACKEND = "http://10.230.18.52:3000";
 
 
@@ -97,11 +95,12 @@ async function loadColorsFromJson() {
 // =================================================================
 // TASK POLLING
 // =================================================================
-async function startPollingTask(taskId) {
+async function startPollingTask() {
     try {
-        // Task-ID aus taskId.json lesen
-        const fileData = await fs.readFile('../data/taskId.json', 'utf-8');
-        const { taskId } = JSON.parse(fileData);
+        // Task-ID aus taskId.json lesen (Browser-Version)
+        const resp = await fetch('../data/taskId.json');
+        const json = await resp.json();
+        const taskId = json.taskId;
 
         if (!taskId) {
             console.error('Keine Task-ID in taskId.json gefunden');
@@ -141,9 +140,10 @@ async function startPollingTask(taskId) {
         }, 2000);
 
     } catch (err) {
-        console.error('Fehler beim Lesen von taskId.json:', err);
+        console.error('Fehler beim Laden von taskId.json:', err);
     }
 }
+
 
 
 // =================================================================
