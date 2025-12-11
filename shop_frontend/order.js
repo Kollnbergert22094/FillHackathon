@@ -7,8 +7,8 @@ const colorNames = {
     '#000000': 'schwarz',
     '#808080': 'grau'
 };
-
-const BACKEND = "http://10.230.18.52:3000";
+const BACKEND = "http://192.168.4.6:3000";
+// const BACKEND = "http://10.230.18.52:3000";
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
