@@ -102,7 +102,7 @@ async function loadTaskId() {
         
         if (!data.taskId) throw new Error("taskId fehlt in taskId.json");
 
-        return data.taskId;
+        return data.taskId.taskId;
 
     } catch (err) {
         console.error("Fehler beim Laden der Task-ID:", err);
