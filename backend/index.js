@@ -48,6 +48,15 @@
       console.log("Task queued:", taskId);
     }
 
+    const fs = require('fs');
+
+    fs.writeFile('../data/taskId.json', JSON.stringify({ taskId }), (err) => {
+        if (err) return res.status(500).json({ error: 'Fehler beim Speichern' });
+        res.json({ message: 'Task-ID gespeichert' });
+    });
+
+    console.log("Write in json " + taskId);
+
     res.json({ taskId });
   });
 
