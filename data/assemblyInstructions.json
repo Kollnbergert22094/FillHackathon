@@ -3,7 +3,7 @@
   "steps": [
     {
       "step": 1,
-      "text": "Rumpf vorbereiten: Rumpf auspacken, eventuelle Stützstrukturen entfernen.",
+      "text": "Rumpf und Kopf verbinden",
       "image": "images/step1.png"
     },
     {
@@ -18,6 +18,11 @@
     },
     {
       "step": 4,
+      "text": "Beine einsetzen: Beide Beine auf die Unterseite des Rumpfes stecken und prüfen, dass das Maskottchen stabil steht.",
+      "image": "images/step4.png"
+    },
+    {
+      "step": 5,
       "text": "Beine einsetzen: Beide Beine auf die Unterseite des Rumpfes stecken und prüfen, dass das Maskottchen stabil steht.",
       "image": "images/step4.png"
     }
