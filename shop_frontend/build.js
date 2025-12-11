@@ -1,5 +1,6 @@
 // const BACKEND = "http://192.168.4.5:3000";
-const BACKEND = "http://10.230.18.52:3000";
+// const BACKEND = "http://10.230.18.52:3000";
+const BACKEND = "http://localhost:3000";
 
 let colorsFromJson = {};
 
@@ -162,7 +163,7 @@ function startPollingTask(taskId) {
                     currentOrderStatus = 1;
                     clearInterval(pollingInterval);
                     pollingInterval = null;
-                    alert("Task ist fehlgeschlagen!");
+                    // alert("Task ist fehlgeschlagen!");
                     break;
             }
 

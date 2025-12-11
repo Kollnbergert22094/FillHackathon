@@ -18,7 +18,8 @@
 
   <script>
     // const BACKEND = "http://192.168.4.6:3000";
-    const BACKEND = "http://10.230.18.52:3000";
+    // const BACKEND = "http://10.230.18.52:3000";
+const BACKEND = "http://localhost:3000";
 
     const tasksEl = document.getElementById("tasks");
     const popup = document.getElementById("popup");
@@ -78,8 +79,11 @@
 
             const div = document.createElement("div");
             div.className = "part";
+            // div.innerHTML = `
+            //   <img src="../data/images/${item.partId+"_"+item.colorId + ".png" || ''}">
+            //   <div>${colorName} ${partName}</div>
+            // `;
             div.innerHTML = `
-              <img src="../data/images/${item.partId+"_"+item.colorId + ".png" || ''}">
               <div>${colorName} ${partName}</div>
             `;
             popupItemsEl.appendChild(div);
