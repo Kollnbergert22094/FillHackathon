@@ -10,7 +10,7 @@ const colorNames = {
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
-let currentOrderStatus = 2; 
+let currentOrderStatus = 4; 
 
 let colorsFromJson = {};
 
@@ -70,6 +70,12 @@ function changePartColor(part, direction) {
     updateLegoFigure();
 }
 
+// =================================================================
+// 2. HAUPTFUNKTIONEN (Farbwechsel und Stepper)
+// =================================================================
+
+// ... (updateLegoFigure und changePartColor bleiben unverändert)
+
 /**
  * Aktualisiert den visuellen Status-Stepper basierend auf dem aktuellen Schritt.
  * @param {number} currentStepNumber - Die Nummer des aktuell aktiven Schritts (z.B. 2).
@@ -88,24 +94,34 @@ function updateStepperStatus(currentStepNumber) {
         step.classList.remove('finished', 'current');
         
         if (stepNum < currentStepNumber) {
-            // Schritte, die VOR dem aktuellen Schritt liegen, sind 'finished'
+            // Schritte, die VOR dem aktuellen Schritt liegen, sind 'finished' (Grünes Icon)
             step.classList.add('finished');
         } else if (stepNum === currentStepNumber) {
-            // Der aktuelle Schritt ist 'current'
+            // Der aktuelle Schritt ist 'current' (Rotes Icon mit Puls)
             step.classList.add('current');
         }
     });
     
     lines.forEach((line, index) => {
         const lineNum = index + 1;
-        line.classList.remove('active');
+        // Linien-Klassen immer zurücksetzen
+        line.classList.remove('active', 'finished'); 
         
-        if (lineNum < currentStepNumber) {
-            // Linien vor dem aktuellen Schritt sind 'active'
-            line.classList.add('active');
+        // Logik für die Linien:
+        
+        // 1. Grüne Linie ('finished'): Wenn der nächste Schritt (lineNum + 1) ebenfalls abgeschlossen ist.
+        if (lineNum + 1 < currentStepNumber) {
+             line.classList.add('finished'); // Setzt Klasse für GRÜN
+        } 
+        // 2. Rote Linie ('active'): Wenn die Linie zum aktuellen Schritt führt.
+        else if (lineNum < currentStepNumber) {
+            line.classList.add('active'); // Setzt Klasse für ROT
         }
+        // Ansonsten bleibt die Linie neutral (Grau)
     });
 }
+
+// ... (Rest des JavaScript-Codes bleibt unverändert)
 
 // =================================================================
 // FARBEN AUS JSON LADEN
