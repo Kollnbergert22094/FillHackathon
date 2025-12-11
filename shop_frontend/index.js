@@ -10,7 +10,7 @@ const colorNames = {
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
-let currentOrderStatus = 2; 
+let currentOrderStatus = 3; 
 
 let colorsFromJson = {};
 
@@ -97,11 +97,20 @@ function updateStepperStatus(currentStepNumber) {
     
     lines.forEach((line, index) => {
         const lineNum = index + 1;
-        line.classList.remove('active');
+        line.classList.remove('active', 'finished');
         
         if (lineNum < currentStepNumber) {
             // Linien vor dem aktuellen Schritt sind 'active'
             line.classList.add('active');
+        }
+
+        if (lineNum + 1 < currentStepNumber) { 
+             // Wenn z.B. currentStepNumber=4, dann sind Linien 1 und 2 fertig (grün).
+             line.classList.add('finished'); // Neue Klasse für die grüne Linie
+             line.classList.remove('active'); // Muss 'active' entfernen, um Überschneidungen zu vermeiden
+        } else if (lineNum < currentStepNumber) {
+            // Ansonsten ist die Linie 'active' (rot) und führt zum aktuellen Schritt
+            line.classList.add('active'); 
         }
     });
 }

@@ -113,7 +113,7 @@ body {
 /* VERBINDUNGSLINIE */
 .step_line {
     flex-grow: 1;
-    height: 4px;
+    height: 4px;    
     background-color: #e0e0e0;
     margin: 15px -15px 0 -15px; /* Mittig zwischen den Icons */
     transition: background-color 0.3s ease;
@@ -121,6 +121,10 @@ body {
 
 .step_line.active {
     background-color: #b60000; /* Aktive Linie in Akzentfarbe */
+}
+
+.step_line.active.finished {
+    background-color: #4CAF50; /* Grün für fertige Linie */
 }
 
 /* Entferne alte Progress Bar Styles, falls noch vorhanden */
