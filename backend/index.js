@@ -23,41 +23,59 @@
   // POST /api/task/start
   // --------------------------------------------
   app.post('/api/task/start', async (req, res) => {
-    const items = req.body;
+    const itemsFilePath = path.join(__dirname, '../data/items.json');
 
-    if (!Array.isArray(items)) {
-      return res.status(400).json({ error: "items sind Pflichtfelder" });
-    }
+    // Items aus JSON-Datei lesen
+    fs.readFile(itemsFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error("Fehler beim Lesen der Items-Datei:", err);
+            return res.status(500).json({ error: 'Fehler beim Lesen der Items-Datei' });
+        }
 
-    const taskId = "task_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        let items;
+        try {
+            const parsed = JSON.parse(data);
+            items = parsed.items;
+            if (!Array.isArray(items)) throw new Error('Ungültiges Format');
+        } catch (parseErr) {
+            console.error("Fehler beim Parsen der Items-Datei:", parseErr);
+            return res.status(500).json({ error: 'Items-Datei ist ungültig' });
+        }
 
-    const newTask = {
-      taskId,
-      status: "pending",
-      itemsToPick: items,
-      result: null,
-      polling: false
-    };
+        // Task erstellen
+        const taskId = "task_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
 
-    tasks[taskId] = newTask;
-    console.log("Task created:", taskId);
+        const newTask = {
+            taskId,
+            status: "pending",
+            itemsToPick: items,
+            result: null,
+            polling: false
+        };
 
-    if (!currentTaskId) {
-      startTask(newTask);
-    } else {
-      taskQueue.push(newTask);
-      console.log("Task queued:", taskId);
-    }
+        tasks[taskId] = newTask;
+        console.log("Task created:", taskId);
 
-    const fs = require('fs');
+        if (!currentTaskId) {
+            startTask(newTask);
+        } else {
+            taskQueue.push(newTask);
+            console.log("Task queued:", taskId);
+        }
 
-    fs.writeFile('../data/taskId.json', JSON.stringify({ taskId }), (err) => {
-        if (err) return res.status(500).json({ error: 'Fehler beim Speichern' });
+        // Task-ID speichern
+        const taskIdFilePath = path.join(__dirname, '../data/taskId.json');
+        fs.writeFile(taskIdFilePath, JSON.stringify({ taskId }), (writeErr) => {
+            if (writeErr) {
+                console.error("Fehler beim Speichern der Task-ID:", writeErr);
+                return res.status(500).json({ error: 'Fehler beim Speichern der Task-ID' });
+            }
+
+            console.log("Task-ID in JSON gespeichert:", taskId);
+            // Antwort an Client senden
+            res.json({ taskId });
+        });
     });
-
-    console.log("Write in json " + taskId);
-
-    res.json({ taskId });
   });
 
   async function startTask(task) {
