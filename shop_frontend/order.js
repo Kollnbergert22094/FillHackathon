@@ -27,7 +27,7 @@ const currentColorsIndex = {
 
 function updateLegoFigure() {
     // Mapping: part -> dateipräfix (teilnummern in deinen Dateinamen)
-    const partPrefix = { head: 1, torso: 2, arms: 3, legs: 4 };
+    const partPrefix = { head: 1, torso: 2, arms: 3, legs: 5 };
     const partsToUpdate = ['head', 'torso', 'arms', 'legs'];
 
     partsToUpdate.forEach(part => {
@@ -45,7 +45,7 @@ function updateLegoFigure() {
         // zweite Bild-Elemente (arms-2, legs-2) ebenfalls aktualisieren
         if (part === 'arms') {
             const img2 = document.getElementById('arms-2');
-            if (img2) img2.src = `/data/images/${partPrefix['arms']}_${variantIndex}.png`;
+            if (img2) img2.src = `/data/images/${(partPrefix['arms']) + 1 }_${variantIndex}.png`;
         }
         if (part === 'legs') {
             const img2 = document.getElementById('legs-2');
@@ -180,7 +180,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Config:', selectedConfig);
             
             // In JSON speichern
-            await saveItemToJson(selectedConfig);
             
             const newWin = window.open('build.html', '_blank');
             if (newWin) newWin.focus();
@@ -188,17 +187,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Neue Funktion zum Speichern
 async function saveItemToJson(itemData) {
-    try {
-        const response = await fetch('/api/save-item', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(itemData)
-        });
-        const result = await response.json();
-        console.log('Gespeichert:', result);
+     try {
+         const response = await fetch('/api/save-item', { // Der Server-Endpunkt
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' }, // Wichtig: Teilt dem Server das Format mit
+             body: JSON.stringify(itemData) // Konvertiert das JS-Objekt in einen JSON-String 
+              });
+
+     if (!response.ok) {
+         throw new Error(`HTTP Fehler! Status: ${response.status}`);
+        }
+    const result = await response.json();
+    console.log(' Speichern erfolgreich:', result);
     } catch (err) {
-        console.error('Fehler beim Speichern:', err);
+        console.error(' Fehler beim Speichern:', err);
     }
 }
