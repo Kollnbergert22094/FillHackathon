@@ -7,8 +7,8 @@ const colorNames = {
     '#000000': 'schwarz',
     '#808080': 'grau'
 };
-const BACKEND = "http://192.168.4.5:3000";
-// const BACKEND = "http://10.230.18.52:3000";
+//const BACKEND = "http://192.168.4.5:3000";
+const BACKEND = "http://10.230.18.52:3000";
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
@@ -38,8 +38,7 @@ const partIdMapping = {
     // Wenn 'legs' im Ziel-JSON '4' sein soll, ändere dies zu 4.
 }
 const colorMapping = {
-    grey: 3,
-    red: 1,
+    grey: 1,
     black: 2
 }
 
@@ -160,7 +159,6 @@ async function loadColorsFromJson() {
         console.log('Daten geladen:', colors);
 
         const nameToHex = {
-            'red': 'red',
             'black': 'black',
             'grey': 'grey'
         };
@@ -182,10 +180,10 @@ async function loadColorsFromJson() {
         };
         
         colorsID = {
-            head: colorMapping[hexCodes[2]],
-            torso: colorMapping[hexCodes[2]],
-            arms: colorMapping[hexCodes[2]],
-            legs: colorMapping[hexCodes[2]]
+            head: colorMapping[hexCodes[0]],
+            torso: colorMapping[hexCodes[0]],
+            arms: colorMapping[hexCodes[0]],
+            legs: colorMapping[hexCodes[0]]
         }
         
         console.log('colorsFromJson:', colorsFromJson);
