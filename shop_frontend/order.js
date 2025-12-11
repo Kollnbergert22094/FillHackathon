@@ -303,6 +303,40 @@ async function startTaskFrontend() {
 // =================================================================
 // TASK POLLING
 // =================================================================
+// function startPollingTask(taskId) {
+//     currentTaskId = taskId;
+//     if (pollingInterval) clearInterval(pollingInterval);
+
+//     pollingInterval = setInterval(async () => {
+//         try {
+//             const resp = await fetch(`${BACKEND}/api/task/${taskId}/status`);
+//             const data = await resp.json();
+//             if (!data?.status) return;
+
+//             switch(data.status) {
+//                 case 'pending': currentOrderStatus = 1; break;
+//                 case 'running': currentOrderStatus = 2; break;
+//                 case 'done':
+//                     currentOrderStatus = 4;
+//                     clearInterval(pollingInterval);
+//                     pollingInterval = null;
+//                     break;
+//                 case 'error':
+//                     currentOrderStatus = 1;
+//                     clearInterval(pollingInterval);
+//                     pollingInterval = null;
+//                     alert('Task ist fehlgeschlagen!');
+//                     break;
+//             }
+
+//             updateStepperStatus(currentOrderStatus);
+//         } catch (err) {
+//             console.error('Polling Fehler:', err);
+//         }
+//     }, 2000);
+// }
+
+
 function startPollingTask(taskId) {
     currentTaskId = taskId;
     if (pollingInterval) clearInterval(pollingInterval);
@@ -310,28 +344,58 @@ function startPollingTask(taskId) {
     pollingInterval = setInterval(async () => {
         try {
             const resp = await fetch(`${BACKEND}/api/task/${taskId}/status`);
-            const data = await resp.json();
-            if (!data?.status) return;
 
-            switch(data.status) {
-                case 'pending': currentOrderStatus = 1; break;
-                case 'running': currentOrderStatus = 2; break;
-                case 'done':
+            // Wenn Status nicht OK -> weiterprobieren
+            if (!resp.ok) {
+                console.warn("Backend antwortet noch nicht…", resp.status);
+                return; // weiter pollen
+            }
+
+            let data;
+
+            try {
+                // JSON sicher parsen – kann fehlschlagen, wenn leer
+                const text = await resp.text();
+                if (!text.trim()) {
+                    console.log("Status-Antwort ist leer – weiter pollen…");
+                    return; // NICHT abbrechen
+                }
+                data = JSON.parse(text);
+            } catch {
+                console.log("JSON ist ungültig – Backend noch nicht bereit");
+                return; // weiter pollen
+            }
+
+            if (!data.status) {
+                console.log("Status fehlt – weiter pollen…");
+                return;
+            }
+
+            switch (data.status) {
+                case "pending":
+                    currentOrderStatus = 1;
+                    break;
+                case "running":
+                    currentOrderStatus = 2;
+                    break;
+                case "done":
                     currentOrderStatus = 4;
                     clearInterval(pollingInterval);
                     pollingInterval = null;
                     break;
-                case 'error':
+                case "error":
                     currentOrderStatus = 1;
                     clearInterval(pollingInterval);
                     pollingInterval = null;
-                    alert('Task ist fehlgeschlagen!');
+                    alert("Task ist fehlgeschlagen!");
                     break;
             }
 
             updateStepperStatus(currentOrderStatus);
+
         } catch (err) {
-            console.error('Polling Fehler:', err);
+            console.log("Polling Fehler:", err.message);
+            // auch hier nicht abbrechen → weiter pollen
         }
     }, 2000);
 }
