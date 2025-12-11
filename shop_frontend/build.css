@@ -277,6 +277,7 @@ body {
     display: block;
     margin: 15px auto 0 auto;
     width: 85%;
+    height: 350px;
     max-width: 350px;
     border-radius: 10px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.15);
