@@ -1,3 +1,5 @@
+const BACKEND = "http://10.230.18.52:3000";
+
 
 let colorsFromJson = {};
 
@@ -6,6 +8,7 @@ const colorNames = {
     '#000000': 'schwarz',
     '#808080': 'grau'
 };
+
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
@@ -98,7 +101,7 @@ function startPollingTask(taskId) {
 
     pollingInterval = setInterval(async () => {
         try {
-            const resp = await fetch(`/api/task/${taskId}/status`);
+            const resp = await fetch(`${BACKEND}/api/task/${taskId}/status`);
             const data = await resp.json();
             if (!data?.status) return;
 
@@ -143,7 +146,7 @@ async function startTaskFrontend() {
         }
 
         // 2. Task beim Backend starten
-        const respTask = await fetch('/api/task/start', {
+        const respTask = await fetch(`${BACKEND}/api/task/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(items)

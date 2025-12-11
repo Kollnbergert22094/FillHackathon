@@ -17,13 +17,7 @@
   </div>
 
   <script>
-    let BACKEND = "http://10.230.18.39:3000";
-    fetch('/config')
-    .then(res => res.json())
-    .then(config => {
-        BACKEND = "http://" + config.IP_ADRESS + ":" + config.PORT;
-        console.log("Python Backend IP:", BACKEND);
-    });
+    const BACKEND = "http://10.230.18.52:3000";
 
     const tasksEl = document.getElementById("tasks");
     const popup = document.getElementById("popup");
