@@ -7,8 +7,8 @@ const colorNames = {
     '#000000': 'schwarz',
     '#808080': 'grau'
 };
-
-const BACKEND = "http://10.230.18.52:3000";
+const BACKEND = "http://192.168.4.6:3000";
+// const BACKEND = "http://10.230.18.52:3000";
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
@@ -82,11 +82,11 @@ function changePartColor(part, direction) {
     const colors = colorsFromJson[part] || ['#000000'];
 
     if (direction === 'next') {
-        currentIndex = (currentIndex + 1) % colors.length;
+        currentIndex = (currentIndex + 1) % colorId.length;
     } else {
-        currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+        currentIndex = (currentIndex - 1 + colorId.length) % colorId.length;
     }
-    
+    console.log(colors)
     currentColorsIndex[part] = currentIndex;
     console.log("Neuer Index für", part, ":", currentIndex, "Farbe:", colors[currentIndex]);
     updateLegoFigure();
