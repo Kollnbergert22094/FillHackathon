@@ -169,16 +169,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const addToCartBtn = document.querySelector('.add-to-cart');
     if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', () => {
+        addToCartBtn.addEventListener('click', async () => {
             const selectedConfig = {};
             for (const part in currentColorsIndex) {
                 const partColors = colorsFromJson[part] || ['#000000'];
-                selectedConfig[part] = partColors;
+                const index = currentColorsIndex[part];
+                selectedConfig[part] = partColors[index];
             }
             
             console.log('Config:', selectedConfig);
+            
+            // In JSON speichern
+            await saveItemToJson(selectedConfig);
+            
             const newWin = window.open('build.html', '_blank');
             if (newWin) newWin.focus();
         });
     }
 });
+
+// Neue Funktion zum Speichern
+async function saveItemToJson(itemData) {
+    try {
+        const response = await fetch('/api/save-item', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(itemData)
+        });
+        const result = await response.json();
+        console.log('Gespeichert:', result);
+    } catch (err) {
+        console.error('Fehler beim Speichern:', err);
+    }
+}
