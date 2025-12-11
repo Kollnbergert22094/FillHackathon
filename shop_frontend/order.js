@@ -199,27 +199,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-async function saveTaskIdToJson(taskId) {
-    try {
-        const response = await fetch(BACKEND + '/api/save-task-id', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ taskId }) // Backend erwartet { taskId }
-        });
+// async function saveTaskIdToJson(taskId) {
+//     try {
+//         const response = await fetch(BACKEND + '/api/save-task-id', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ taskId }) // Backend erwartet { taskId }
+//         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP Fehler! Status: ${response.status}`);
-        }
+//         if (!response.ok) {
+//             throw new Error(`HTTP Fehler! Status: ${response.status}`);
+//         }
 
-        const result = await response.json();
-        console.log('Task-ID gespeichert:', result);
+//         const result = await response.json();
+//         console.log('Task-ID gespeichert:', result);
 
-    } catch (err) {
-        console.error('Fehler beim Speichern der Task-ID:', err);
-    }
-}
+//     } catch (err) {
+//         console.error('Fehler beim Speichern der Task-ID:', err);
+//     }
+// }
 
 
 async function saveItems(items) {
@@ -271,14 +271,14 @@ async function startTaskFrontend() {
             body: JSON.stringify(items)
         });
 
-        const data = await respTask.json();
+        // const data = await respTask.json();
 
-        if (data.taskId) {
-            console.log('Task gestartet:', data.taskId);
-            await saveTaskIdToJson({ taskId: data.taskId });
-        } else {
-            console.error('Fehler beim Starten des Tasks', data);
-        }
+        // if (data.taskId) {
+        //     console.log('Task gestartet:', data.taskId);
+        //     await saveTaskIdToJson({ taskId: data.taskId });
+        // } else {
+        //     console.error('Fehler beim Starten des Tasks', data);
+        // }
     } catch (err) {
         console.error('Fehler beim Laden/Starten des Tasks:', err);
     }
