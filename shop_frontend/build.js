@@ -1,3 +1,5 @@
+import fs from 'fs/promises';
+
 const BACKEND = "http://10.230.18.52:3000";
 
 
@@ -13,8 +15,8 @@ const colorNames = {
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
 let currentOrderStatus = 1; 
-let currentTaskId = null; 
-let pollingInterval = null;
+// let currentTaskId = null; 
+// let pollingInterval = null;
 
 
 /**
@@ -95,76 +97,91 @@ async function loadColorsFromJson() {
 // =================================================================
 // TASK POLLING
 // =================================================================
-function startPollingTask(taskId) {
-    currentTaskId = taskId;
-    if (pollingInterval) clearInterval(pollingInterval);
+async function startPollingTask(taskId) {
+    try {
+        // Task-ID aus taskId.json lesen
+        const fileData = await fs.readFile('../data/taskId.json', 'utf-8');
+        const { taskId } = JSON.parse(fileData);
 
-    pollingInterval = setInterval(async () => {
-        try {
-            const resp = await fetch(`${BACKEND}/api/task/${taskId}/status`);
-            const data = await resp.json();
-            if (!data?.status) return;
-
-            switch(data.status) {
-                case 'pending': currentOrderStatus = 1; break;
-                case 'running': currentOrderStatus = 2; break;
-                case 'done':
-                    currentOrderStatus = 4;
-                    clearInterval(pollingInterval);
-                    pollingInterval = null;
-                    break;
-                case 'error':
-                    currentOrderStatus = 1;
-                    clearInterval(pollingInterval);
-                    pollingInterval = null;
-                    alert('Task ist fehlgeschlagen!');
-                    break;
-            }
-
-            updateStepperStatus(currentOrderStatus);
-        } catch (err) {
-            console.error('Polling Fehler:', err);
+        if (!taskId) {
+            console.error('Keine Task-ID in taskId.json gefunden');
+            return;
         }
-    }, 2000);
+
+        currentTaskId = taskId;
+
+        if (pollingInterval) clearInterval(pollingInterval);
+
+        pollingInterval = setInterval(async () => {
+            try {
+                const resp = await fetch(`${BACKEND}/api/task/${currentTaskId}/status`);
+                const data = await resp.json();
+                if (!data?.status) return;
+
+                switch (data.status) {
+                    case 'pending': currentOrderStatus = 1; break;
+                    case 'running': currentOrderStatus = 2; break;
+                    case 'done':
+                        currentOrderStatus = 4;
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                        break;
+                    case 'error':
+                        currentOrderStatus = 1;
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                        console.error('Task ist fehlgeschlagen!');
+                        break;
+                }
+
+                updateStepperStatus(currentOrderStatus);
+            } catch (err) {
+                console.error('Polling Fehler:', err);
+            }
+        }, 2000);
+
+    } catch (err) {
+        console.error('Fehler beim Lesen von taskId.json:', err);
+    }
 }
 
 
 // =================================================================
 // ACTUAL TASK START
 // =================================================================
-async function startTaskFrontend() {
-    try {
-        // 1. Items aus JSON laden
-        const respItems = await fetch('../data/items.json');
-        if (!respItems.ok) throw new Error('items.json konnte nicht geladen werden');
-        const itemsData = await respItems.json();
-        const items = itemsData.items; // erwartet: { "items": [ {...}, {...} ] }
+// async function startTaskFrontend() {
+//     try {
+//         // 1. Items aus JSON laden
+//         const respItems = await fetch('../data/items.json');
+//         if (!respItems.ok) throw new Error('items.json konnte nicht geladen werden');
+//         const itemsData = await respItems.json();
+//         const items = itemsData.items; // erwartet: { "items": [ {...}, {...} ] }
 
-        if (!items || !items.length) {
-            console.error('Keine Items gefunden in items.json');
-            return;
-        }
+//         if (!items || !items.length) {
+//             console.error('Keine Items gefunden in items.json');
+//             return;
+//         }
 
-        // 2. Task beim Backend starten
-        const respTask = await fetch(`${BACKEND}/api/task/start`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(items)
-        });
+//         // 2. Task beim Backend starten
+//         const respTask = await fetch(`${BACKEND}/api/task/start`, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(items)
+//         });
 
-        const data = await respTask.json();
+//         const data = await respTask.json();
 
-        if (data.taskId) {
-            console.log('Task gestartet:', data.taskId);
-            startPollingTask(data.taskId);
-        } else {
-            console.error('Fehler beim Starten des Tasks', data);
-        }
+//         if (data.taskId) {
+//             console.log('Task gestartet:', data.taskId);
+//             startPollingTask(data.taskId);
+//         } else {
+//             console.error('Fehler beim Starten des Tasks', data);
+//         }
 
-    } catch (err) {
-        console.error('Fehler beim Laden/Starten des Tasks:', err);
-    }
-}
+//     } catch (err) {
+//         console.error('Fehler beim Laden/Starten des Tasks:', err);
+//     }
+// }
 
 // =================================================================
 // 3. EVENTS (Laden und Bestellen)
@@ -173,7 +190,8 @@ async function startTaskFrontend() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadColorsFromJson();
     updateStepperStatus(currentOrderStatus);    
-    startTaskFrontend();
+    await startPollingTask();
+    // startTaskFrontend();
 });
 
 

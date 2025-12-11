@@ -1,3 +1,6 @@
+import fs from 'fs/promises';
+import fetch from 'node-fetch';
+
 // =================================================================
 // 1. KONFIGURATION
 // =================================================================
@@ -13,6 +16,10 @@ const colorNames = {
 let currentOrderStatus = 4; 
 
 let colorsFromJson = {};
+
+
+let currentTaskId = null; 
+let pollingInterval = null;
 
 const currentColorsIndex = {
     head: 0,
@@ -184,6 +191,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const newWin = window.open('build.html', '_blank');
             if (newWin) newWin.focus();
+            
+            startTaskFrontend();    
         });
     }
 });
@@ -204,4 +213,124 @@ async function saveItemToJson(itemData) {
     } catch (err) {
         console.error(' Fehler beim Speichern:', err);
     }
+}
+
+
+
+
+
+
+
+
+
+// =================================================================
+// ACTUAL TASK START
+// =================================================================
+// async function startTaskFrontend() {
+//     try {
+//         // 1. Items aus JSON laden
+//         const respItems = await fetch('../data/items.json');
+//         if (!respItems.ok) throw new Error('items.json konnte nicht geladen werden');
+//         const itemsData = await respItems.json();
+//         const items = itemsData.items; // erwartet: { "items": [ {...}, {...} ] }
+
+//         if (!items || !items.length) {
+//             console.error('Keine Items gefunden in items.json');
+//             return;
+//         }
+
+//         // 2. Task beim Backend starten
+//         const respTask = await fetch(`${BACKEND}/api/task/start`, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(items)
+//         });
+
+//         const data = await respTask.json();
+
+//         if (data.taskId) {
+//             console.log('Task gestartet:', data.taskId);
+//             startPollingTask(data.taskId);
+//         } else {
+//             console.error('Fehler beim Starten des Tasks', data);
+//         }
+
+//     } catch (err) {
+//         console.error('Fehler beim Laden/Starten des Tasks:', err);
+//     }
+// }
+
+async function startTaskFrontend() {
+    try {
+        // 1. Items aus JSON laden
+        const respItems = await fetch('../data/items.json');
+        if (!respItems.ok) throw new Error('items.json konnte nicht geladen werden');
+        const itemsData = await respItems.json();
+        const items = itemsData.items;
+
+        if (!items || !items.length) {
+            console.error('Keine Items gefunden in items.json');
+            return;
+        }
+
+        // 2. Task beim Backend starten
+        const respTask = await fetch(`${BACKEND}/api/task/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(items)
+        });
+
+        const data = await respTask.json();
+
+        if (data.taskId) {
+            console.log('Task gestartet:', data.taskId);
+
+            // 3. Task-ID in taskId.json speichern
+            await fs.writeFile('../data/taskId.json', JSON.stringify({ taskId: data.taskId }, null, 2));
+            console.log('Task-ID in taskId.json gespeichert');
+        } else {
+            console.error('Fehler beim Starten des Tasks', data);
+        }
+
+    } catch (err) {
+        console.error('Fehler beim Laden/Starten des Tasks:', err);
+    }
+}
+
+
+
+// =================================================================
+// TASK POLLING
+// =================================================================
+function startPollingTask(taskId) {
+    currentTaskId = taskId;
+    if (pollingInterval) clearInterval(pollingInterval);
+
+    pollingInterval = setInterval(async () => {
+        try {
+            const resp = await fetch(`${BACKEND}/api/task/${taskId}/status`);
+            const data = await resp.json();
+            if (!data?.status) return;
+
+            switch(data.status) {
+                case 'pending': currentOrderStatus = 1; break;
+                case 'running': currentOrderStatus = 2; break;
+                case 'done':
+                    currentOrderStatus = 4;
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                    break;
+                case 'error':
+                    currentOrderStatus = 1;
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                    alert('Task ist fehlgeschlagen!');
+                    break;
+            }
+
+            updateStepperStatus(currentOrderStatus);
+        } catch (err) {
+            console.error('Polling Fehler:', err);
+        }
+    }, 2000);
 }
