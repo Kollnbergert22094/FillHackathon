@@ -82,11 +82,11 @@ function changePartColor(part, direction) {
     const colors = colorsFromJson[part] || ['#000000'];
 
     if (direction === 'next') {
-        currentIndex = (currentIndex + 1) % colors.length;
+        currentIndex = (currentIndex + 1) % colorId.length;
     } else {
-        currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+        currentIndex = (currentIndex - 1 + colorId.length) % colorId.length;
     }
-    
+    console.log(colors)
     currentColorsIndex[part] = currentIndex;
     console.log("Neuer Index für", part, ":", currentIndex, "Farbe:", colors[currentIndex]);
     updateLegoFigure();
