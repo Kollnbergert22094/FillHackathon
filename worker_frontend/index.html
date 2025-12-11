@@ -17,7 +17,8 @@
   </div>
 
   <script>
-    const BACKEND = "http://192.168.4.6:3000";
+    // const BACKEND = "http://192.168.4.6:3000";
+    const BACKEND = "http://10.230.18.52:3000";
 
     const tasksEl = document.getElementById("tasks");
     const popup = document.getElementById("popup");
@@ -73,7 +74,7 @@
         if (data.items && Array.isArray(data.items)) {
           data.items.forEach(item => {
             const partName = partsMap[item.partId] || "unknown";
-            const colorName = colorsMap[item.colorId] || "unknown";
+            const colorName = colorsMap[item.colorId] || "unknown"; 
 
             const div = document.createElement("div");
             div.className = "part";
