@@ -27,6 +27,20 @@ const currentColorsIndex = {
     legs: 0
 };
 
+const partIdMapping = {
+    head: 1,
+    torso: 2,
+    arms: 3,
+    legs: 5 
+    // ACHTUNG: Basierend auf deiner bisherigen Logik. 
+    // Wenn 'legs' im Ziel-JSON '4' sein soll, ändere dies zu 4.
+}
+const colorMapping = {
+    grey: 1,
+    red: 2,
+    black: 3
+}
+
 // =================================================================
 // 2. HAUPTFUNKTIONEN (Farbwechsel)
 // =================================================================
@@ -180,12 +194,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             for (const part in currentColorsIndex) {
                 const partColors = colorsFromJson[part];
                 selectedConfig[part] = partColors;
+                colorsId = colorMapping[partColors]
             }
             
             console.log('Config:', selectedConfig);
             
             
-            const items = transformConfigToOrderFormat();
+            const items = transformConfigToOrderFormat(colorMapping);
 
             saveItems(items)
             // // In JSON speichern
