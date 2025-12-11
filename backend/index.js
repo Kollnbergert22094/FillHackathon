@@ -172,6 +172,15 @@ app.post('/api/save-item', async (req, res) => {
         return;
       }
 
+      if (pyStatus === "done") {
+        task.status = "done";
+        console.log("Task completed:", taskId);
+
+        currentTaskId = null;
+        startNextTask();
+        return;
+      }
+
       if (pyStatus === "error") {
         clearInterval(interval);
         task.status = "error";
