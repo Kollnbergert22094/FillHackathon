@@ -342,3 +342,19 @@ app.get('/api/task/clear-dummy', (req, res) => {
   console.log(`Alle Tasks gelöscht (${count} Tasks).`);
   res.json({ success: true, message: `Alle ${count} Tasks gelöscht.` });
 });
+
+
+
+
+app.post('/api/save-task-id', (req, res) => {
+    const { taskId } = req.body;
+    const fs = require('fs');
+
+    fs.writeFile('../data/taskId.json', JSON.stringify({ taskId }), (err) => {
+        if (err) return res.status(500).json({ error: 'Fehler beim Speichern' });
+        res.json({ message: 'Task-ID gespeichert' });
+    });
+
+    
+  console.log("Write in json " + taskId);
+});

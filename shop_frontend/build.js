@@ -97,7 +97,7 @@ async function loadColorsFromJson() {
 // =================================================================
 async function startPollingTask() {
     try {
-        // Task-ID aus taskId.json lesen (Browser-Version)
+        // Task-ID aus JSON laden
         const resp = await fetch('../data/taskId.json');
         const json = await resp.json();
         const taskId = json.taskId;
@@ -113,7 +113,7 @@ async function startPollingTask() {
 
         pollingInterval = setInterval(async () => {
             try {
-                const resp = await fetch(`${BACKEND}/api/task/${currentTaskId}/status`);
+                const resp = await fetch(`${BACKEND}/api/task/${taskId}/status`);
                 const data = await resp.json();
                 if (!data?.status) return;
 
@@ -134,6 +134,7 @@ async function startPollingTask() {
                 }
 
                 updateStepperStatus(currentOrderStatus);
+
             } catch (err) {
                 console.error('Polling Fehler:', err);
             }

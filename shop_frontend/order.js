@@ -282,8 +282,12 @@ async function startTaskFrontend() {
         if (data.taskId) {
             console.log('Task gestartet:', data.taskId);
 
-            // 3. Task-ID in taskId.json speichern
-            await fs.writeFile('../data/taskId.json', JSON.stringify({ taskId: data.taskId }, null, 2));
+            await fetch(BACKEND + '/api/save-task-id', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskId: data.taskId })
+            });
+
             console.log('Task-ID in taskId.json gespeichert');
         } else {
             console.error('Fehler beim Starten des Tasks', data);
