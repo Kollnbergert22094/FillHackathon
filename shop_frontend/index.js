@@ -10,7 +10,7 @@ const colorNames = {
 
 // Variable zur Steuerung des Bestellstatus (für den Stepper)
 // 1 = Bestellt, 2 = Bearbeitung, 3 = Versand, 4 = Zugestellt (je nach HTML)
-let currentOrderStatus = 3; 
+let currentOrderStatus = 2; 
 
 let colorsFromJson = {};
 
@@ -22,33 +22,34 @@ const currentColorsIndex = {
 };
 
 // =================================================================
-// 2. HAUPTFUNKTIONEN (Farbwechsel und Stepper)
+// 2. HAUPTFUNKTIONEN (Farbwechsel)
 // =================================================================
 
 function updateLegoFigure() {
+    // Mapping: part -> dateipräfix (teilnummern in deinen Dateinamen)
+    const partPrefix = { head: 1, torso: 2, arms: 3, legs: 4 };
     const partsToUpdate = ['head', 'torso', 'arms', 'legs'];
 
     partsToUpdate.forEach(part => {
-        // Sichere Abfrage: falls colorsFromJson noch leer -> Fallback
         const partColors = colorsFromJson[part] || ['#000000'];
-        const hexColor = partColors[currentColorsIndex[part]] || '#000000';
-        
-        const svgElement = document.getElementById(part);
-        if (svgElement) {
-            svgElement.setAttribute('fill', hexColor);
+        const index = currentColorsIndex[part] % Math.max(1, partColors.length);
+        // variantIndex beginnt bei 1, also +1
+        const variantIndex = index + 1;
+        const prefix = partPrefix[part] || part;
+        const img = document.getElementById(part);
+        if (img) {
+            // Setze src auf passende Bilddatei. Beispiel: /data/images/1_2.png
+            img.src = `/data/images/${prefix}_${variantIndex}.png`;
         }
-        
-        if (part === 'legs') {
-             const svgElement2 = document.getElementById('legs-2');
-             if (svgElement2) {
-                 svgElement2.setAttribute('fill', hexColor);
-             }
-        }
+
+        // zweite Bild-Elemente (arms-2, legs-2) ebenfalls aktualisieren
         if (part === 'arms') {
-            const svgElement2 = document.getElementById('arms-2');
-            if (svgElement2) {
-                svgElement2.setAttribute('fill', hexColor);
-            }
+            const img2 = document.getElementById('arms-2');
+            if (img2) img2.src = `/data/images/${partPrefix['arms']}_${variantIndex}.png`;
+        }
+        if (part === 'legs') {
+            const img2 = document.getElementById('legs-2');
+            if (img2) img2.src = `/data/images/${partPrefix['legs']}_${variantIndex}.png`;
         }
     });
 }
@@ -97,20 +98,11 @@ function updateStepperStatus(currentStepNumber) {
     
     lines.forEach((line, index) => {
         const lineNum = index + 1;
-        line.classList.remove('active', 'finished');
+        line.classList.remove('active');
         
         if (lineNum < currentStepNumber) {
             // Linien vor dem aktuellen Schritt sind 'active'
             line.classList.add('active');
-        }
-
-        if (lineNum + 1 < currentStepNumber) { 
-             // Wenn z.B. currentStepNumber=4, dann sind Linien 1 und 2 fertig (grün).
-             line.classList.add('finished'); // Neue Klasse für die grüne Linie
-             line.classList.remove('active'); // Muss 'active' entfernen, um Überschneidungen zu vermeiden
-        } else if (lineNum < currentStepNumber) {
-            // Ansonsten ist die Linie 'active' (rot) und führt zum aktuellen Schritt
-            line.classList.add('active'); 
         }
     });
 }
@@ -158,19 +150,14 @@ async function loadColorsFromJson() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadColorsFromJson();
     updateLegoFigure();
-    
-    // Stepper Status beim Laden aktualisieren
-    updateStepperStatus(currentOrderStatus); 
 
     const addToCartBtn = document.querySelector('.add-to-cart');
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', () => {
             const selectedConfig = {};
             for (const part in currentColorsIndex) {
-                const index = currentColorsIndex[part];
                 const partColors = colorsFromJson[part] || ['#000000'];
-                const hexColor = partColors[index] || '#000000';
-                selectedConfig[part] = colorNames[hexColor] || hexColor;
+                selectedConfig[part] = partColors;
             }
 
             console.log('Config:', selectedConfig);
@@ -179,32 +166,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
-
-// =================================================================
-// Füge montageanleitung hinzu
-// =================================================================
-
-fetch("../data/assemblyInstructions.json")
-    .then(response => response.json())
-    .then(data => {
-        // Titel setzen
-        document.getElementById("assembly_title").textContent = data.title;
-
-        const stepsContainer = document.getElementById("assembly_steps");
-        stepsContainer.innerHTML = ""; 
-
-        data.steps.forEach(step => {
-            const stepElement = document.createElement("div");
-            stepElement.classList.add("assembly_step");
-
-            stepElement.innerHTML = `
-                <div class="step_top">
-                    <div class="step_number">${step.step}</div>
-                    <div class="step_text">${step.text}</div>
-                </div>
-                <img class="step_image" src="../data/${step.image}" alt="Schritt ${step.step}">
-            `;
-            stepsContainer.appendChild(stepElement);
-        });
-    })
-    .catch(err => console.error("Fehler beim Laden der JSON:", err));
