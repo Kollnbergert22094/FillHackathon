@@ -17,65 +17,6 @@
   const taskQueue = []; // queue neue Tasks
   let currentTaskId = null; 
 
-
-app.post('/api/save-item', async (req, res) => {
-    console.log('--- POST-Request /api/save-item empfangen ---');
-    const itemData = req.body; // Erwartet: { "items": [{ partId: X, colorId: Y }, ...] }
-    
-    // Validierung (überprüfen, ob das Array "items" existiert)
-    if (!itemData || !Array.isArray(itemData.items) || itemData.items.length === 0) {
-        return res.status(400).json({ success: false, message: 'Ungültiges oder leeres "items"-Array im Body gefunden.' });
-    }
-
-    // --- 1. DATEN SPEICHERN ---
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `config_${timestamp}.json`;
-    const filePath = path.join(__dirname, 'saved_configs', filename); 
-
-    try {
-        await fs.mkdir(path.join(__dirname, 'saved_configs'), { recursive: true });
-        await fs.writeFile(filePath, JSON.stringify(itemData, null, 2), 'utf8');
-
-        console.log(`✅ Konfiguration erfolgreich gespeichert als: ${filename}`);
-
-        // --- 2. AGV TASK STARTEN ---
-        // Rufe die Logik zum Starten des Tasks auf
-        const itemsToPick = itemData.items; // Die Daten sind bereits im korrekten Format für den AGV Task
-        
-        const taskId = "task_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-
-        const newTask = {
-            taskId,
-            status: "pending",
-            itemsToPick: itemsToPick,
-            result: null,
-            polling: false
-        };
-
-        tasks[taskId] = newTask;
-        console.log("Task created by /save-item:", taskId);
-
-        if (!currentTaskId) {
-            startTask(newTask); // Starte sofort, wenn kein Task läuft
-        } else {
-            taskQueue.push(newTask); // Ansonsten in die Warteschlange
-            console.log("Task queued:", taskId);
-        }
-
-        // Antwort an den Client senden, inklusive der neuen Task-ID
-        res.status(200).json({ 
-            success: true, 
-            message: 'Konfiguration gespeichert und AGV-Task gestartet.', 
-            filename: filename,
-            taskId: taskId 
-        });
-
-    } catch (error) {
-        console.log('❌ Fehler beim Speichern der Datei oder Starten des Tasks:', error);
-        res.status(500).json({ success: false, message: 'Fehler beim Speichern/Starten auf dem Server.' });
-    }
-});
-
   // --------------------------------------------
   // USER STARTET TASK
   // POST /api/task/start
