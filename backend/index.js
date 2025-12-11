@@ -305,12 +305,11 @@ app.post('/api/save-task-id', (req, res) => {
         res.json({ message: 'Task-ID gespeichert' });
     });
 
-    
   console.log("Write in json " + taskId);
 });
 
 
-app.post('/api/sabe-items', (req, res) => {
+app.post('/api/save-items', (req, res) => {
   const items = req.body;
   const fs =require('fs');
 

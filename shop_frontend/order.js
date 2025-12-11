@@ -144,19 +144,19 @@ async function loadColorsFromJson() {
         console.log('Daten geladen:', colors);
 
         const nameToHex = {
-            'red': '#FF0000',
-            'black': '#000000',
-            'grey': '#808080'
+            'red': 'red',
+            'black': 'black',
+            'grey': 'grey'
         };
         
         const hexCodes = colors.colors.map(c => nameToHex[c.name.toLowerCase()]);
         console.log('Hex-Codes:', hexCodes);
         
         colorsFromJson = {
-            head: hexCodes,
-            torso: hexCodes,
-            arms: hexCodes,
-            legs: hexCodes
+            head: hexCodes[2],
+            torso: hexCodes[2],
+            arms: hexCodes[2],
+            legs: hexCodes[2]
         };
         
         console.log('colorsFromJson:', colorsFromJson);
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const newWin = window.open('build.html', '_blank');
             if (newWin) newWin.focus();
             
-            startTaskFrontend();    
+            startTaskFrontend();
         });
     }
 });
@@ -227,7 +227,7 @@ async function saveItems(items) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(items) // Backend erwartet { taskId }
+            body: JSON.stringify(items)
         });
 
         if (!response.ok) {
