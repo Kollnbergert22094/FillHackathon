@@ -15,6 +15,8 @@ const BACKEND = "http://10.230.18.52:3000";
 let currentOrderStatus = 4; 
 
 let colorsFromJson = {};
+let colorId = [];
+let colorsID
 
 
 let currentTaskId = null; 
@@ -36,9 +38,9 @@ const partIdMapping = {
     // Wenn 'legs' im Ziel-JSON '4' sein soll, ändere dies zu 4.
 }
 const colorMapping = {
-    grey: 1,
-    red: 2,
-    black: 3
+    grey: 3,
+    red: 1,
+    black: 2
 }
 
 // =================================================================
@@ -163,15 +165,28 @@ async function loadColorsFromJson() {
             'grey': 'grey'
         };
         
+
+        for (const colorName in colorMapping) {
+            colorId.push(colorMapping[colorName]);
+            
+        }
+        console.log('colorID', colorId);
         const hexCodes = colors.colors.map(c => nameToHex[c.name.toLowerCase()]);
         console.log('Hex-Codes:', hexCodes);
-        
+        console.log(colorMapping['grey'])
         colorsFromJson = {
             head: hexCodes[2],
             torso: hexCodes[2],
             arms: hexCodes[2],
             legs: hexCodes[2]
         };
+        
+        colorsID = {
+            head: colorMapping[hexCodes[2]],
+            torso: colorMapping[hexCodes[2]],
+            arms: colorMapping[hexCodes[2]],
+            legs: colorMapping[hexCodes[2]]
+        }
         
         console.log('colorsFromJson:', colorsFromJson);
     } catch (err) {
@@ -191,18 +206,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', async () => {
             const selectedConfig = {};
-            const colorsId = {};
             for (const part in currentColorsIndex) {
                 const partColors = colorsFromJson[part];
                 selectedConfig[part] = partColors;
-                colorsId = colorMapping[partColors]
             }
             
             console.log('Config:', selectedConfig);
             
+            const items = transformConfigToOrderFormat(colorsID);
             
-            const items = transformConfigToOrderFormat(colorsId);
+            console.log(colorId)
             console.log(items);
+            
 
             saveItems(items)
             // // In JSON speichern
@@ -315,7 +330,7 @@ function transformConfigToOrderFormat(colorsIndex) {
         const colorIndex = colorsIndex[partName]; 
         
         // Die Color ID ist der Index + 1 (typisch für 1-basierte IDs im Backend)
-        const colorId = colorIndex + 1; 
+        const colorId = colorIndex; 
 
         // Füge das neue Item zum Array hinzu
         items.push({
