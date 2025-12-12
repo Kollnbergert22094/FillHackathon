@@ -90,9 +90,9 @@ function changePartColor(part, direction) {
     const colors = colorsFromJson[part] || ['#000000'];
 
     if (direction === 'next') {
-        currentIndex = (currentIndex + 1) % colorId.length;
+        currentIndex = (currentIndex + 1) % 2;
     } else {
-        currentIndex = (currentIndex - 1 + colorId.length) % colorId.length;
+        currentIndex = (currentIndex - 1 + 2) % 2;
     }
     console.log(colors)
     currentColorsIndex[part] = currentIndex;

@@ -1,0 +1,59 @@
+/* Generelle Stile für die Seite */
+body {
+    /* Setzt die Seite auf die volle Größe des Viewports */
+    margin: 0;
+    
+    /* 1. Mache das Body-Element zu einem Flex-Container */
+    display: flex;
+    
+    /* 2. Zentriere den Inhalt horizontal */
+    justify-content: center;
+    position: relative;
+    /* 3. Zentriere den Inhalt vertikal */
+    align-items: center;
+    
+    /* Hintergrund: Dunkles Tannengrün */
+    background-color: #314f72; 
+    height: 100vh;
+    overflow: hidden; /* Verhindert Scrollbalken durch fallende Elemente */
+}
+
+.content {
+    /* Stellt sicher, dass der Container den Inhalt umschließt */
+    text-align: center; 
+    padding: 30px 40px; /* Mehr Polsterung */
+    border-radius: 15px;
+    /* Optional: Ein leichter Hintergrund, um den Inhalt hervorzuheben */
+    background-color: rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.text {
+    /* Anwendung der über HTML eingebundenen Google Font */
+    font-family: 'Mountains of Christmas', cursive;
+    font-size: 3.5em; /* Größerer Text */
+    color: #ffd700; /* Goldgelb */
+    margin-bottom: 30px;
+    line-height: 1.2; 
+    /* Für einen eisigen oder verschneiten Look */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.5);
+    font-weight: 700; /* Fettgedruckte Version der Schrift */
+}
+
+button {
+    background-color: #ed1c24; /* Weihnachtsrot */
+    color: white;
+    border: 0;
+    padding: 12px 25px;
+    border-radius: 25px; /* Abgerundeter Button */
+    cursor: pointer;
+    font-size: 1.3em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+button:hover {
+    background-color: #ff454d;
+    transform: scale(1.05); /* Leichter Vergrößerungseffekt */
+}
